@@ -1,0 +1,9 @@
+[submodule "Lib/Formats"]
+	path = Lib/Formats
+	url = https://github.com/nintenstudio/Formats.git
+[submodule "Lib/ImGui"]
+	path = Lib/ImGui
+	url = https://github.com/ocornut/imgui.git
+[submodule "Lib/Switch-CMake"]
+	path = Lib/Switch-CMake
+	url = https://github.com/nintenstudio/switch-cmake.git
