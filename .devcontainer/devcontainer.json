@@ -4,5 +4,5 @@
   },
   "features": {
   },
-  "postcreatecommand": "git submodule update --recursive --init ; sudo apt install clang -y ; pause -t 50000"
+  "postCreateCommand": "git submodule update --recursive --init ; sudo apt install clang -y ; pause -t 50000"
 }
