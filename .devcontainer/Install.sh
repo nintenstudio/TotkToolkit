@@ -5,6 +5,6 @@ sudo apt-get install -y clang
 
 chmod +x ./.devcontainer/install-devkitpro-pacman.sh
 sudo ./.devcontainer/install-devkitpro-pacman.sh
-echo "\n" | sudo dkp-pacman -S switch-dev
+printf "\n" | sudo dkp-pacman -S switch-dev
 
 git submodule update --init --recursive
