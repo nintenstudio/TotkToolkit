@@ -3,10 +3,8 @@ sudo apt install -y software-properties-common
 sudo apt-get update
 sudo apt-get install -y clang
 
-wget https://apt.devkitpro.org/install-devkitpro-pacman
-chmod +x ./install-devkitpro-pacman
-sudo ./install-devkitpro-pacman -y
-rm ./install-devkitpro-pacman
+chmod +x ./install-devkitpro-pacman.sh
+sudo ./install-devkitpro-pacman.sh
 sudo dkp-pacman -S switch-dev
 
 git submodule update --init --recursive
