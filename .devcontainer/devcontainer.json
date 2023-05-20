@@ -1,7 +1,4 @@
 {
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
   "features": {
   },
   "postCreateCommand": "bash .devcontainer/Install.sh"
