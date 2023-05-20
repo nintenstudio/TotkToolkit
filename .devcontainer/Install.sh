@@ -6,6 +6,6 @@ sudo apt-get install -y clang
 chmod +x ./.devcontainer/install-devkitpro-pacman.sh
 sudo ./.devcontainer/install-devkitpro-pacman.sh
 printf "\n y" | sudo dkp-pacman -S switch-dev
-sudo echo 'DEVKITPRO=/opt/devkitpro' >> /etc/environment 
+echo 'DEVKITPRO=/opt/devkitpro' | sudo tee /etc/environment
 
 git submodule update --init --recursive
