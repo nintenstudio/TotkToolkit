@@ -1,16 +1,20 @@
 ﻿#include <TotkToolkit/TotkToolkit.h>
 
+
 #include <iostream>
-#if SWITCH
+#ifdef SWITCH
 #include <switch.h>
+#else
+#include <iostream>
 #endif
 
 int main()
 {
-#if SWITCH
+#ifdef SWITCH
 	consoleInit(NULL);
 
-	std::cout << "Hello world!" << std::endl;
+	printf("test");
+	//std::cout << "Hello world!" << std::endl;
 
 	while (appletMainLoop()) {      // while the application hasn't received an exit request...
 		consoleUpdate(NULL);        // Update the screen
@@ -20,7 +24,7 @@ int main()
 
 #endif
 
-	std::cout << "Hello world!" << std::endl;
+	//std::cout << "Hello world!" << std::endl;
 
 	return 0;
 }

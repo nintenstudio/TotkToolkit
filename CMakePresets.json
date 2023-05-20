@@ -4,7 +4,6 @@
         {
             "name": "windows-base",
             "hidden": true,
-            "generator": "Ninja",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "installDir": "${sourceDir}/out/install/${presetName}",
             "cacheVariables": {
@@ -18,14 +17,21 @@
             }
         },
         {
-            "name": "switch-base",
+            "name": "linux-base",
             "hidden": true,
-            "generator": "Ninja",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "installDir": "${sourceDir}/out/install/${presetName}",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "cl.exe",
-                "CMAKE_CXX_COMPILER": "cl.exe",
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang"
+            }
+        },
+        {
+            "name": "switch-base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "installDir": "${sourceDir}/out/install/${presetName}",
+            "cacheVariables": {
                 "CMAKE_TOOLCHAIN_FILE": "Lib/Switch-CMake/DevkitA64Libnx.cmake"
             }
         },
@@ -65,6 +71,46 @@
             "name": "x86-release-windows",
             "displayName": "x86 Release (Windows)",
             "inherits": "x86-debug-windows",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "x64-debug-linux",
+            "displayName": "x64 Debug (Linux)",
+            "inherits": "linux-base",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "x64-release-linux",
+            "displayName": "x64 Release (Linux)",
+            "inherits": "x64-debug-linux",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "x86-debug-linux",
+            "displayName": "x86 Debug (Linux)",
+            "inherits": "linux-base",
+            "architecture": {
+                "value": "x86",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "x86-release-linux",
+            "displayName": "x86 Release (Linux)",
+            "inherits": "x86-debug-linux",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
