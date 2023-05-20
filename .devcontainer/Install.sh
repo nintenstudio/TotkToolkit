@@ -5,7 +5,7 @@ sudo apt-get install -y clang
 
 wget https://apt.devkitpro.org/install-devkitpro-pacman
 chmod +x ./install-devkitpro-pacman
-sudo ./install-devkitpro-pacman
+sudo ./install-devkitpro-pacman -y
 rm ./install-devkitpro-pacman
 sudo dkp-pacman -S switch-dev
 
