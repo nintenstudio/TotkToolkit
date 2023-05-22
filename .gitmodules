@@ -7,6 +7,9 @@
 [submodule "Lib/Switch-CMake"]
 	path = Lib/Switch-CMake
 	url = https://github.com/nintenstudio/switch-cmake.git
-[submodule "Lib/SDL"]
-	path = Lib/SDL
-	url = https://github.com/devkitPro/SDL.git
+[submodule "Lib/GLFW"]
+	path = Lib/GLFW
+	url = https://github.com/devkitPro/glfw.git
+[submodule "Lib/Switch-GLAD"]
+	path = Lib/Switch-GLAD
+	url = https://github.com/devkitPro/switch-glad.git
