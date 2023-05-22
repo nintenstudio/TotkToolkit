@@ -9,6 +9,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
+# Use C++ standard library (For some reason we need to have this here...)
+target_link_libraries(TotkToolkit PUBLIC stdc++)
+
 # Include this
 target_include_directories(TotkToolkit PRIVATE Private Public)
 
@@ -16,11 +19,6 @@ target_include_directories(TotkToolkit PRIVATE Private Public)
 target_include_directories(TotkToolkit PUBLIC Lib/Formats/Public Lib/ImGui)
 add_subdirectory(Lib/Formats)
 target_link_libraries(TotkToolkit PUBLIC Formats)
-
-# Use ImGui
-add_library(ImGui STATIC Lib/ImGui/imgui.h Lib/ImGui/imgui.cpp Lib/ImGui/imstb_rectpack.h Lib/ImGui/imstb_textedit.h Lib/ImGui/imstb_truetype.h Lib/ImGui/imgui_demo.cpp Lib/ImGui/imgui_draw.cpp Lib/ImGui/imgui_internal.h Lib/ImGui/imgui_tables.cpp Lib/ImGui/imgui_widgets.cpp)
-target_include_directories(TotkToolkit PUBLIC Lib/ImGui)
-target_link_libraries(TotkToolkit PUBLIC ImGui)
 
 # Use GLFW
 if (SWITCH)
@@ -43,8 +41,11 @@ add_library(GLAD "Lib/Switch-GLAD/include/glad/glad.h" "Lib/Switch-GLAD/source/g
 target_include_directories(GLAD PUBLIC "Lib/Switch-GLAD/include")
 target_link_libraries(TotkToolkit PUBLIC GLAD)
 
-# Use C++ standard library (For some reason we need to have this here...)
-target_link_libraries(TotkToolkit PUBLIC stdc++)
+# Use ImGui
+include(${CMAKE_CURRENT_SOURCE_DIR}/ImGui.cmake)
+target_include_directories(ImGui PUBLIC "Lib/GLFW/include")
+target_include_directories(TotkToolkit PUBLIC Lib/ImGui)
+target_link_libraries(TotkToolkit PUBLIC ImGui)
 
 # Prefer more modern OpenGL. Especially matters when not building for switch.
 set(OpenGL_GL_PREFERENCE GLVND)
