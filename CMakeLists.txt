@@ -22,27 +22,70 @@ add_library(ImGui STATIC Lib/ImGui/imgui.h Lib/ImGui/imgui.cpp Lib/ImGui/imstb_r
 target_include_directories(TotkToolkit PUBLIC Lib/ImGui)
 target_link_libraries(TotkToolkit PUBLIC ImGui)
 
-# Use SDL
+# Use GLFW
 if (SWITCH)
-SET(NINTENDO_SWITCH ON) # For SDL
+    SET(NINTENDO_SWITCH ON) # For GLFW
 endif()
-set(SDL_STATIC ON CACHE BOOL "" FORCE)
-set(SDL_SHARED OFF CACHE BOOL "" FORCE)
-add_subdirectory(Lib/SDL)
-target_compile_features(SDL2-static PRIVATE c_std_11)
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-find_package(Threads REQUIRED)
-target_link_libraries(TotkToolkit PUBLIC Threads::Threads)
-target_link_libraries(TotkToolkit PUBLIC SDL2-static)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_EGL_STATIC ON CACHE BOOL "" FORCE)
+if (SWITCH) # If GLFW_VULKAN_STATIC is off on switch it doesn't compile because it cannot dynamically load. We set it to ON because it won't attempt to load vulkan on switch anyway. On the other hand, if GLFW_VULKAN_STATIC is on on linux it runs into linking errors.
+    set(GLFW_VULKAN_STATIC ON CACHE BOOL "" FORCE)
+else()
+    set(GLFW_VULKAN_STATIC OFF CACHE BOOL "" FORCE)
+endif()
+add_subdirectory(Lib/GLFW)
+target_link_libraries(TotkToolkit PUBLIC glfw)
+
+# Use GLAD
+add_library(GLAD "Lib/Switch-GLAD/include/glad/glad.h" "Lib/Switch-GLAD/source/glad.c")
+target_include_directories(GLAD PUBLIC "Lib/Switch-GLAD/include")
+target_link_libraries(TotkToolkit PUBLIC GLAD)
+
+# Use C++ standard library (For some reason we need to have this here...)
+target_link_libraries(TotkToolkit PUBLIC stdc++)
+
+# Prefer more modern OpenGL. Especially matters when not building for switch.
+set(OpenGL_GL_PREFERENCE GLVND)
 
 # Set up for switch if desired
 if (SWITCH)
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Lib/Switch-CMake/cmake)
-include(SwitchTools)
-find_package(LIBNX REQUIRED)
-target_include_directories(TotkToolkit PUBLIC ${LIBNX_INCLUDE_DIR})
-target_link_libraries(TotkToolkit PUBLIC switch::libnx)
-ADD_NRO_TARGET(TotkToolkit)
-#target_include_directories(SDL2-static PUBLIC ${LIBNX_INCLUDE_DIR})
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Lib/Switch-CMake/cmake)
+    include(SwitchTools)
+    ADD_NRO_TARGET(TotkToolkit)
+
+    # Set up LIBNX
+    find_package(LIBNX REQUIRED)
+    target_include_directories(TotkToolkit SYSTEM PUBLIC ${LIBNX_INCLUDE_DIR})
+    target_link_libraries(TotkToolkit PUBLIC ${LIBNX_LIBRARY})
+    target_include_directories(glfw SYSTEM PUBLIC ${LIBNX_INCLUDE_DIR})
+
+    # Include PORTLIBS
+    target_include_directories(glfw PUBLIC ${PORTLIBS}/include)
+
+    # Set up GLAPI
+    find_library(GLAPI NAMES glapi REQUIRED)
+    target_link_libraries(TotkToolkit PUBLIC ${GLAPI})
+
+    # Give GLAD PORTLIBS include path so it can load KHR/khrplatform.h
+    target_include_directories(GLAD PUBLIC ${PORTLIBS}/include)
+
+    # Set up EGL as imported target (because it requires GLAPI)
+    find_library(EGL NAMES EGL REQUIRED)
+    add_library(EGL STATIC IMPORTED)
+    set_property(TARGET EGL PROPERTY IMPORTED_LOCATION ${EGL})
+    target_link_libraries(EGL INTERFACE ${GLAPI})
+    target_link_libraries(TotkToolkit PUBLIC EGL)
+
+    # set up DRM_NOUVEAU as imported target (because it requires LIBNX)
+    find_library(DRM_NOUVEAU NAMES drm_nouveau REQUIRED)
+    add_library(DRM_NOUVEAU STATIC IMPORTED)
+    set_property(TARGET DRM_NOUVEAU PROPERTY IMPORTED_LOCATION ${DRM_NOUVEAU})
+    target_link_libraries(DRM_NOUVEAU INTERFACE ${LIBNX_LIBRARY})
+    target_link_libraries(TotkToolkit PUBLIC DRM_NOUVEAU)
+else()
+    find_package(OpenGL REQUIRED)
+    target_link_libraries(TotkToolkit PUBLIC OpenGL::GL)
+    target_link_libraries(TotkToolkit PUBLIC OpenGL::EGL)
 endif()

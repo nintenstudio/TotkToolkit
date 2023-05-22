@@ -33,6 +33,9 @@
             "installDir": "${sourceDir}/out/install/${presetName}",
             "cacheVariables": {
                 "CMAKE_TOOLCHAIN_FILE": "Lib/Switch-CMake/DevkitA64Libnx.cmake"
+            },
+            "environment": {
+                "DEVKITPRO": "/opt/devkitpro"
             }
         },
         {
