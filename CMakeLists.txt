@@ -23,6 +23,7 @@ target_link_libraries(TotkToolkit PUBLIC Formats)
 # Use GLFW
 if (SWITCH)
     SET(NINTENDO_SWITCH ON) # For GLFW
+    SET(SWITCH_LIBNX ON) # For GLFW (Doesn't do too much...)
 endif()
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
