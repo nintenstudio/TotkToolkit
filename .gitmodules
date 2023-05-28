@@ -9,7 +9,10 @@
 	url = https://github.com/nintenstudio/switch-cmake.git
 [submodule "Lib/GLFW"]
 	path = Lib/GLFW
-	url = https://github.com/devkitPro/glfw.git
+	url = https://github.com/nintenstudio/GLFW.git
 [submodule "Lib/Switch-GLAD"]
 	path = Lib/Switch-GLAD
 	url = https://github.com/devkitPro/switch-glad.git
+[submodule "Lib/Sarc_Archiver"]
+	path = Lib/Sarc_Archiver
+	url = https://github.com/Torphedo/sarc_archiver.git

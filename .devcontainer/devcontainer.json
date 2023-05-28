@@ -1,5 +1,18 @@
 {
   "features": {
+	  "ghcr.io/devcontainers/features/desktop-lite:1": {}
+  },
+  "customizations": {
+    "codespaces": {
+      "repositories": {
+        "nintenstudio/Formats": {
+          "permissions": "write-all"
+        },
+        "nintenstudio/GLFW": {
+          "permissions": "write-all"
+        }
+      }
+    }
   },
   "postCreateCommand": "bash .devcontainer/Install.sh"
 }

@@ -1,7 +1,7 @@
 ﻿cmake_minimum_required (VERSION 3.8)
 
 project (TotkToolkit C CXX)
-add_executable(TotkToolkit "Public/TotkToolkit/TotkToolkit.h" "Private/TotkToolkit/TotkToolkit.cpp")
+add_executable(TotkToolkit "Public/TotkToolkit/TotkToolkit.h" "Private/TotkToolkit/TotkToolkit.cpp" "Public/TotkToolkit/UI/Windows/Window.h" "Private/TotkToolkit/UI/Windows/Window.cpp" "Public/TotkToolkit/UI/ImGuiItem.h" "Public/TotkToolkit/UI/Windows/Filesystem/Browser.h" "Private/TotkToolkit/UI/Windows/Filesystem/Browser.cpp" "Public/TotkToolkit/UI/Localization/TranslationSource.h" "Private/TotkToolkit/UI/ImGuiItem.cpp" "Public/TotkToolkit/UI/MainWindow.h" "Private/TotkToolkit/UI/MainWindow.cpp" "Public/TotkToolkit/UI/Windows/Editors/Text.h" "Private/TotkToolkit/UI/Windows/Editors/Text.cpp")
 set_target_properties(TotkToolkit PROPERTIES APP_TITLE "TotkToolkit" APP_AUTHOR "Me" APP_VERSION "1.0.0")
 
 set(CMAKE_CXX_STANDARD 20)
@@ -90,3 +90,6 @@ else()
     target_link_libraries(TotkToolkit PUBLIC OpenGL::GL)
     target_link_libraries(TotkToolkit PUBLIC OpenGL::EGL)
 endif()
+
+# For when Sarc_Arhiver is useful:
+#add_subdirectory(Lib/Sarc_Archiver)

@@ -15,14 +15,17 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_glfw.cpp> // Same with this one
 
+#include <TotkToolkit/UI/MainWindow.h>
+#include <TotkToolkit/UI/Windows/Editors/Text.h>
+
 int main()
 {
 	if (!glfwInit())
 		return 0;
     #if (SWITCH)
-	    GLFWwindow* window = glfwCreateWindow(640, 480, "My Title", glfwGetPrimaryMonitor(), NULL);
+	    GLFWwindow* window = glfwCreateWindow(640, 480, "TotkToolkit", glfwGetPrimaryMonitor(), NULL);
     #else
-        GLFWwindow* window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
+        GLFWwindow* window = glfwCreateWindow(640, 480, "TotkToolkit", NULL, NULL);
     #endif
 
 	glfwMakeContextCurrent(window);
@@ -35,6 +38,14 @@ int main()
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io.ConfigInputTrickleEventQueue = false;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    #if (!SWITCH)
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    #endif
+    #if (SWITCH)
+        io.AddMouseSourceEvent(ImGuiMouseSource_TouchScreen);
+    #endif
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -44,8 +55,10 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
 
+    ImVec4 clearColor = ImVec4(0.09f, 0.09f, 0.12f, 1.00f);
     bool showDemoWindow = true;
-    ImVec4 clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    TotkToolkit::UI::MainWindow mainWindow;
+    TotkToolkit::UI::Windows::Editors::Text sdf("Text editor");
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -53,8 +66,12 @@ int main()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGui::DockSpaceOverViewport();
         if (showDemoWindow)
             ImGui::ShowDemoWindow(&showDemoWindow);
+        
+        mainWindow.Draw();
+        sdf.Draw();
 
         ImGui::Render();
         int display_w, display_h;
@@ -63,6 +80,14 @@ int main()
         glClearColor(clearColor.x * clearColor.w, clearColor.y * clearColor.w, clearColor.z * clearColor.w, clearColor.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) 
+        { 
+            GLFWwindow* backup_current_context = glfwGetCurrentContext(); 
+            ImGui::UpdatePlatformWindows(); 
+            ImGui::RenderPlatformWindowsDefault(); 
+            glfwMakeContextCurrent(backup_current_context); 
+        } 
 
     	glfwSwapBuffers(window);
 	}
