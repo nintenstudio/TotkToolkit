@@ -1,16 +1,16 @@
-﻿cmake_minimum_required (VERSION 3.8)
-
-project (TotkToolkit C CXX)
-add_executable(TotkToolkit "Public/TotkToolkit/TotkToolkit.h" "Private/TotkToolkit/TotkToolkit.cpp" "Public/TotkToolkit/UI/Windows/Window.h" "Private/TotkToolkit/UI/Windows/Window.cpp" "Public/TotkToolkit/UI/ImGuiItem.h" "Public/TotkToolkit/UI/Windows/Filesystem/Browser.h" "Private/TotkToolkit/UI/Windows/Filesystem/Browser.cpp" "Public/TotkToolkit/UI/Localization/TranslationSource.h" "Private/TotkToolkit/UI/ImGuiItem.cpp" "Public/TotkToolkit/UI/MainWindow.h" "Private/TotkToolkit/UI/MainWindow.cpp" "Public/TotkToolkit/UI/Windows/Editors/Text.h" "Private/TotkToolkit/UI/Windows/Editors/Text.cpp")
-set_target_properties(TotkToolkit PROPERTIES APP_TITLE "TotkToolkit" APP_AUTHOR "Me" APP_VERSION "1.0.0")
+﻿cmake_minimum_required (VERSION 3.10)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
+project (TotkToolkit C CXX)
+add_executable(TotkToolkit "Public/TotkToolkit/TotkToolkit.h" "Private/TotkToolkit/TotkToolkit.cpp" "Public/TotkToolkit/UI/Windows/Window.h" "Private/TotkToolkit/UI/Windows/Window.cpp" "Public/TotkToolkit/UI/ImGuiItem.h" "Public/TotkToolkit/UI/Windows/Filesystem/Browser.h" "Private/TotkToolkit/UI/Windows/Filesystem/Browser.cpp" "Public/TotkToolkit/UI/Localization/TranslationSource.h" "Private/TotkToolkit/UI/ImGuiItem.cpp" "Public/TotkToolkit/UI/MainWindow.h" "Private/TotkToolkit/UI/MainWindow.cpp" "Public/TotkToolkit/UI/Windows/Editors/Text.h" "Private/TotkToolkit/UI/Windows/Editors/Text.cpp")
+set_target_properties(TotkToolkit PROPERTIES APP_TITLE "TotkToolkit" APP_AUTHOR "Me" APP_VERSION "1.0.0")
+
 # Use C++ standard library (For some reason we need to have this here...)
-target_link_libraries(TotkToolkit PUBLIC stdc++)
+#target_link_libraries(TotkToolkit PUBLIC stdc++)
 
 # Include this
 target_include_directories(TotkToolkit PRIVATE Private Public)
@@ -28,7 +28,11 @@ endif()
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(GLFW_EGL_STATIC ON CACHE BOOL "" FORCE)
+if (SWITCH)
+    set(GLFW_EGL_STATIC ON CACHE BOOL "" FORCE)
+else()
+    set(GLFW_EGL_STATIC OFF CACHE BOOL "" FORCE)
+endif()
 if (SWITCH) # If GLFW_VULKAN_STATIC is off on switch it doesn't compile because it cannot dynamically load. We set it to ON because it won't attempt to load vulkan on switch anyway. On the other hand, if GLFW_VULKAN_STATIC is on on linux it runs into linking errors.
     set(GLFW_VULKAN_STATIC ON CACHE BOOL "" FORCE)
 else()
@@ -89,7 +93,11 @@ if (SWITCH)
 else()
     find_package(OpenGL REQUIRED)
     target_link_libraries(TotkToolkit PUBLIC OpenGL::GL)
-    target_link_libraries(TotkToolkit PUBLIC OpenGL::EGL)
+    if (OpenGL_EGL_FOUND)
+        target_link_libraries(TotkToolkit PUBLIC OpenGL::EGL)
+    else() # Fallback EGL is provided as a submodule
+        target_include_directories(GLAD PUBLIC Lib/EGL-Registry/api)
+    endif()
 endif()
 
 # For when Sarc_Arhiver is useful:

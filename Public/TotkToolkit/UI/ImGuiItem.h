@@ -3,6 +3,7 @@
 #include <Formats/Aliases/Primitives.h>
 
 #include <string>
+#include <sstream>
 #include <iomanip>
 
 namespace TotkToolkit::UI {
