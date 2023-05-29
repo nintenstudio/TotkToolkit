@@ -2,11 +2,7 @@
 
 #include <TotkToolkit/UI/Localization/TranslationSource.h>
 #include <imgui.h>
-
-int inputTextCallback(ImGuiInputTextCallbackData* data) {
-    ((std::string*)(data->UserData))->resize(data->BufSize);
-    return 1;
-}
+#include <misc/cpp/imgui_stdlib.h>
 
 namespace TotkToolkit::UI::Windows::Editors {
     Text::Text(std::string name) : TotkToolkit::UI::Windows::Window(name) {
@@ -14,6 +10,28 @@ namespace TotkToolkit::UI::Windows::Editors {
     }
 
     void Text::DrawContents() {
-        ImGui::InputTextMultiline(ImGuiItem::AppendIdentifier("##InputText").c_str(), &mText[0], mText.size(), ImVec2(0, 0), ImGuiInputTextFlags_CallbackResize, &inputTextCallback, &mText);
+        ImVec2 toolbarCursorStart = ImGui::GetCursorPos();
+        // Any sort of toolbar code can be put here.
+        ImVec2 toolbarCursorEnd = ImGui::GetCursorPos();
+
+        ImVec2 windowContentRegionSize;
+        {
+            ImVec2 windowContentRegionMin = ImGui::GetWindowContentRegionMin();
+            ImVec2 windowContentRegionMax = ImGui::GetWindowContentRegionMax();
+
+            windowContentRegionSize.x = windowContentRegionMax.x - windowContentRegionMin.x;
+            windowContentRegionSize.y = windowContentRegionMax.y - windowContentRegionMin.y;
+        }
+
+        ImVec2 toolbarSize = toolbarCursorEnd;
+        toolbarSize.x -= toolbarCursorStart.x;
+        toolbarSize.y -= toolbarCursorStart.y;
+
+
+
+        ImVec2 inputTextSize = windowContentRegionSize;
+        inputTextSize.x -= toolbarSize.x;
+        inputTextSize.y -= toolbarSize.y;
+        ImGui::InputTextMultiline(ImGuiItem::AppendIdentifier("##InputText").c_str(), &mText, inputTextSize);
     }
 }

@@ -1,4 +1,20 @@
-﻿cmake_minimum_required (VERSION 3.10)
+﻿function(copy_directory_recursive source_dir destination_dir)
+    file(GLOB files_to_copy "${source_dir}/*")
+    foreach(file ${files_to_copy})
+        if(IS_DIRECTORY ${file})
+            get_filename_component(dir_name ${file} NAME)
+            set(destination_dir "${destination_dir}/${dir_name}")
+            file(MAKE_DIRECTORY ${destination_dir})
+            copy_directory_recursive(${file} ${destination_dir})
+        else()
+            get_filename_component(file_name ${file} NAME)
+            set(destination_file "${destination_dir}/${file_name}")
+            configure_file(${file} ${destination_file} COPYONLY)
+        endif()
+    endforeach()
+endfunction()
+
+cmake_minimum_required (VERSION 3.10)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -6,8 +22,10 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 project (TotkToolkit C CXX)
-add_executable(TotkToolkit "Public/TotkToolkit/TotkToolkit.h" "Private/TotkToolkit/TotkToolkit.cpp" "Public/TotkToolkit/UI/Windows/Window.h" "Private/TotkToolkit/UI/Windows/Window.cpp" "Public/TotkToolkit/UI/ImGuiItem.h" "Public/TotkToolkit/UI/Windows/Filesystem/Browser.h" "Private/TotkToolkit/UI/Windows/Filesystem/Browser.cpp" "Public/TotkToolkit/UI/Localization/TranslationSource.h" "Private/TotkToolkit/UI/ImGuiItem.cpp" "Public/TotkToolkit/UI/MainWindow.h" "Private/TotkToolkit/UI/MainWindow.cpp" "Public/TotkToolkit/UI/Windows/Editors/Text.h" "Private/TotkToolkit/UI/Windows/Editors/Text.cpp")
-set_target_properties(TotkToolkit PROPERTIES APP_TITLE "TotkToolkit" APP_AUTHOR "Me" APP_VERSION "1.0.0")
+add_executable(TotkToolkit "Public/TotkToolkit/TotkToolkit.h" "Private/TotkToolkit/TotkToolkit.cpp" "Public/TotkToolkit/UI/Windows/Window.h" "Private/TotkToolkit/UI/Windows/Window.cpp" "Public/TotkToolkit/UI/ImGuiItem.h" "Public/TotkToolkit/UI/Windows/Filesystem/Browser.h" "Private/TotkToolkit/UI/Windows/Filesystem/Browser.cpp" "Public/TotkToolkit/UI/Localization/TranslationSource.h" "Private/TotkToolkit/UI/ImGuiItem.cpp" "Public/TotkToolkit/UI/MainWindow.h" "Private/TotkToolkit/UI/MainWindow.cpp" "Public/TotkToolkit/UI/Windows/Editors/Text.h" "Private/TotkToolkit/UI/Windows/Editors/Text.cpp" "Public/TotkToolkit/IO/Editor.h" "Public/TotkToolkit/UI/Windows/Editors/PlainText.h" "Private/TotkToolkit/UI/Windows/Editors/PlainText.cpp")
+set_target_properties(TotkToolkit PROPERTIES APP_TITLE "TotkToolkit" APP_AUTHOR "Me" APP_VERSION "1.0.0" ROMFS "${CMAKE_CURRENT_SOURCE_DIR}/Romfs")
+
+copy_directory_recursive(${CMAKE_CURRENT_SOURCE_DIR}/Romfs/Resources ${CMAKE_CURRENT_BINARY_DIR}/Resources)
 
 # Include this
 target_include_directories(TotkToolkit PRIVATE Private Public)

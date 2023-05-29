@@ -13,6 +13,8 @@ Lib/ImGui/backends/imgui_impl_opengl3.h
 #Lib/ImGui/backends/imgui_impl_opengl3.cpp # Instead we include this from our code so that it uses our opengl loader (GLAD)
 Lib/ImGui/backends/imgui_impl_glfw.h 
 #Lib/ImGui/backends/imgui_impl_glfw.cpp # Same with this one
+Lib/ImGui/misc/cpp/imgui_stdlib.h
+Lib/ImGui/misc/cpp/imgui_stdlib.cpp
 )
 
 target_include_directories(ImGui PRIVATE Lib/ImGui)
