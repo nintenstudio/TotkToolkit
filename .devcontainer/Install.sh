@@ -17,3 +17,5 @@ sudo apt install libgl1-mesa-dev -y
 sudo apt install libegl1-mesa-dev -y
 
 git submodule update --init --recursive
+
+cp ./.devcontainer/CMakeUserPresets.json ./CMakeUserPresets.json
