@@ -7,7 +7,7 @@
 #endif
 
 namespace TotkToolkit::Rendering {
-	Framebuffer::Framebuffer() {
+	Framebuffer::Framebuffer(GLenum target) : mTarget(target) {
 		glGenFramebuffers(1, &mId);
 
 		GLint maxColorAttachments;
@@ -20,25 +20,19 @@ namespace TotkToolkit::Rendering {
 		glDeleteFramebuffers(1, &mId);
 	}
 
-	void Framebuffer::Bind(GLenum target) {
-		if (this == nullptr) {
-			BindDefault(target);
-		}
-		else {
-			glBindFramebuffer(target, mId);
-			mTarget = target;
+	void Framebuffer::Bind() {
+		glBindFramebuffer(mTarget, mId);
 
-			switch (target) {
-			case GL_FRAMEBUFFER:
-				mBoundFramebuffer = shared_from_this();
-				break;
-			case GL_READ_FRAMEBUFFER:
-				mBoundReadFramebuffer = shared_from_this();
-				break;
-			case GL_DRAW_FRAMEBUFFER:
-				mBoundDrawFramebuffer = shared_from_this();
-				break;
-			}
+		switch (mTarget) {
+		case GL_FRAMEBUFFER:
+			mBoundFramebuffer = shared_from_this();
+			break;
+		case GL_READ_FRAMEBUFFER:
+			mBoundReadFramebuffer = shared_from_this();
+			break;
+		case GL_DRAW_FRAMEBUFFER:
+			mBoundDrawFramebuffer = shared_from_this();
+			break;
 		}
 	}
 
@@ -55,6 +49,15 @@ namespace TotkToolkit::Rendering {
 		case GL_DRAW_FRAMEBUFFER:
 			mBoundDrawFramebuffer = nullptr;
 			break;
+		}
+	}
+
+	void Framebuffer::BindOrBindDefault(std::shared_ptr<Framebuffer> framebuffer, GLenum defaultTarget) {
+		if (framebuffer == nullptr) {
+			BindDefault(defaultTarget);
+		}
+		else {
+			framebuffer->Bind();
 		}
 	}
 
@@ -92,35 +95,63 @@ namespace TotkToolkit::Rendering {
 	}
 
 	void Framebuffer::AttachTexture(std::shared_ptr<TotkToolkit::Rendering::Texture> texture, GLenum attachment, GLint level) {
-		std::shared_ptr<Framebuffer> boundFramebuffer = GetBoundFrameBuffer();
-		Bind(GL_FRAMEBUFFER);
+		std::shared_ptr<Framebuffer> boundFramebuffer;
+		if (mTarget == GL_FRAMEBUFFER)
+			boundFramebuffer = GetBoundFrameBuffer();
+		else if (mTarget == GL_READ_FRAMEBUFFER)
+			boundFramebuffer = GetBoundReadFrameBuffer();
+		else if (mTarget == GL_DRAW_FRAMEBUFFER)
+			boundFramebuffer = GetBoundDrawFrameBuffer();
+
+		Bind();
 		glFramebufferTexture(mTarget, attachment, texture->GetId(), level);
 		SetAttachment(texture, attachment);
-		boundFramebuffer->Bind(GL_FRAMEBUFFER);
+		BindOrBindDefault(boundFramebuffer, mTarget);
 	}
 
 	void Framebuffer::AttachTexture1D(std::shared_ptr<TotkToolkit::Rendering::Texture> texture, GLenum attachment, GLenum texTarget, GLint level) {
-		std::shared_ptr<Framebuffer> boundFramebuffer = GetBoundFrameBuffer();
-		Bind(GL_FRAMEBUFFER);
+		std::shared_ptr<Framebuffer> boundFramebuffer;
+		if (mTarget == GL_FRAMEBUFFER)
+			boundFramebuffer = GetBoundFrameBuffer();
+		else if (mTarget == GL_READ_FRAMEBUFFER)
+			boundFramebuffer = GetBoundReadFrameBuffer();
+		else if (mTarget == GL_DRAW_FRAMEBUFFER)
+			boundFramebuffer = GetBoundDrawFrameBuffer();
+
+		Bind();
 		glFramebufferTexture1D(mTarget, attachment, texTarget, texture->GetId(), level);
 		SetAttachment(texture, attachment);
-		boundFramebuffer->Bind(GL_FRAMEBUFFER);
+		BindOrBindDefault(boundFramebuffer, mTarget);
 	}
 
 	void Framebuffer::AttachTexture2D(std::shared_ptr<TotkToolkit::Rendering::Texture> texture, GLenum attachment, GLenum texTarget, GLint level) {
-		std::shared_ptr<Framebuffer> boundFramebuffer = GetBoundFrameBuffer();
-		Bind(GL_FRAMEBUFFER);
+		std::shared_ptr<Framebuffer> boundFramebuffer;
+		if (mTarget == GL_FRAMEBUFFER)
+			boundFramebuffer = GetBoundFrameBuffer();
+		else if (mTarget == GL_READ_FRAMEBUFFER)
+			boundFramebuffer = GetBoundReadFrameBuffer();
+		else if (mTarget == GL_DRAW_FRAMEBUFFER)
+			boundFramebuffer = GetBoundDrawFrameBuffer();
+
+		Bind();
 		glFramebufferTexture2D(mTarget, attachment, texTarget, texture->GetId(), level);
 		SetAttachment(texture, attachment);
-		boundFramebuffer->Bind(GL_FRAMEBUFFER);
+		BindOrBindDefault(boundFramebuffer, mTarget);
 	}
 
 	void Framebuffer::AttachTexture3D(std::shared_ptr<TotkToolkit::Rendering::Texture> texture, GLenum attachment, GLenum texTarget, GLint level, GLint layer) {
-		std::shared_ptr<Framebuffer> boundFramebuffer = GetBoundFrameBuffer();
-		Bind(GL_FRAMEBUFFER);
+		std::shared_ptr<Framebuffer> boundFramebuffer;
+		if (mTarget == GL_FRAMEBUFFER)
+			boundFramebuffer = GetBoundFrameBuffer();
+		else if (mTarget == GL_READ_FRAMEBUFFER)
+			boundFramebuffer = GetBoundReadFrameBuffer();
+		else if (mTarget == GL_DRAW_FRAMEBUFFER)
+			boundFramebuffer = GetBoundDrawFrameBuffer();
+
+		Bind();
 		glFramebufferTexture3D(mTarget, attachment, texTarget, texture->GetId(), level, layer);
 		SetAttachment(texture, attachment);
-		boundFramebuffer->Bind(GL_FRAMEBUFFER);
+		BindOrBindDefault(boundFramebuffer, mTarget);
 	}
 
 	std::shared_ptr<TotkToolkit::Rendering::Texture> Framebuffer::GetAttachment(GLenum attachment) {

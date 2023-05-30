@@ -11,11 +11,10 @@ namespace TotkToolkit::Rendering {
 	/// </summary>
 	class Framebuffer : public std::enable_shared_from_this<Framebuffer> {
 	public:
-		Framebuffer();
+		Framebuffer(GLenum target);
 		~Framebuffer();
 
-		// If this object is nullptr the default framebuffer will be bound.
-		void Bind(GLenum target);
+		void Bind();
 		static void BindDefault(GLenum target);
 
 		static std::shared_ptr<Framebuffer> GetBoundFrameBuffer();
@@ -46,5 +45,12 @@ namespace TotkToolkit::Rendering {
 		static std::shared_ptr<Framebuffer> mBoundFramebuffer;
 		static std::shared_ptr<Framebuffer> mBoundReadFramebuffer;
 		static std::shared_ptr<Framebuffer> mBoundDrawFramebuffer;
+
+	private:
+		/// <summary>
+		/// If framebuffer is nullptr, bind default. Otherwise, bind this.
+		/// </summary>
+		/// <param name="defaultTarget">The target to bind default to.</param>
+		static void BindOrBindDefault(std::shared_ptr<Framebuffer> framebuffer, GLenum defaultTarget);
 	};
 }
