@@ -5,12 +5,12 @@ namespace TotkToolkit::UI::Windows::Editors {
 
 	}
 
-	bool PlainText::Parse(Formats::IO::BinaryIOStream& stream) {
+	bool PlainText::Parse(std::iostream* stream) {
 
 		return true;
 	}
 
-	bool PlainText::Serialize(Formats::IO::BinaryIOStream& stream) {
+	bool PlainText::Serialize(std::iostream* stream) {
 
 		return true;
 	}
