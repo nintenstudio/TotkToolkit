@@ -7,5 +7,5 @@ namespace TotkToolkit::UI {
         return text + "##" + mId;
     }
 
-    UINT ImGuiItem::mIdCounter = 0;
+    F_UINT ImGuiItem::mIdCounter = 0;
 }

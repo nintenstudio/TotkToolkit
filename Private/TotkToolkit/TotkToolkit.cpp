@@ -16,7 +16,8 @@
 #include <backends/imgui_impl_glfw.cpp> // Same with this one
 
 #include <TotkToolkit/UI/MainWindow.h>
-#include <TotkToolkit/UI/Windows/Editors/PlainText.h>
+#include <TotkToolkit/UI/Windows/Rendering/Viewport.h>
+#include <TotkToolkit/Rendering/RenderingSystem.h>
 
 int main()
 {
@@ -123,7 +124,12 @@ int main()
 
     ImVec4 clearColor = ImVec4(0.09f, 0.09f, 0.12f, 1.00f);
     bool showDemoWindow = true;
+
+    TotkToolkit::Rendering::RenderingSystem::Init();
+
     TotkToolkit::UI::MainWindow mainWindow;
+
+    TotkToolkit::UI::Windows::Rendering::Viewport viewport("Viewport");
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -136,6 +142,7 @@ int main()
             ImGui::ShowDemoWindow(&showDemoWindow);
         
         mainWindow.Draw();
+        viewport.Draw();
 
         ImGui::Render();
         int display_w, display_h;
