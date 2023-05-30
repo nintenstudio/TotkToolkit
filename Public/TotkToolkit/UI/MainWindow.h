@@ -3,6 +3,7 @@
 #include <TotkToolkit/UI/ImGuiItem.h>
 
 #include <TotkToolkit/UI/Windows/Filesystem/Browser.h>
+#include <TotkToolkit/UI/Windows/Configuration/Settings.h>
 
 namespace TotkToolkit::UI {
     class MainWindow : public TotkToolkit::UI::ImGuiItem {
@@ -13,7 +14,9 @@ public:
 
 protected:
         TotkToolkit::UI::Windows::Filesystem::Browser mBrowser;
+        TotkToolkit::UI::Windows::Configuration::Settings mSettings;
 
-        bool mBrowserEnabled = true;
+        bool mBrowserOpen = true;
+        bool mSettingsOpen = false;
     };
 }

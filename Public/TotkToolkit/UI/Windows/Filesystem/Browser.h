@@ -8,7 +8,7 @@
 namespace TotkToolkit::UI::Windows::Filesystem {
     class Browser : public TotkToolkit::UI::Windows::Window {
 public:
-        Browser();
+        Browser(bool* open);
 
         virtual void DrawContents() override;
 

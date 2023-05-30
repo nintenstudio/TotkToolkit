@@ -5,7 +5,7 @@
 #include <misc/cpp/imgui_stdlib.h>
 
 namespace TotkToolkit::UI::Windows::Editors {
-    Text::Text(std::string name) : TotkToolkit::UI::Windows::Window(name) {
+    Text::Text(std::string name, bool* open) : TotkToolkit::UI::Windows::Window(name, open) {
         
     }
 

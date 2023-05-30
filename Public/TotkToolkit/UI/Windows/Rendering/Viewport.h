@@ -8,7 +8,7 @@
 namespace TotkToolkit::UI::Windows::Rendering {
 	class Viewport : public TotkToolkit::UI::Windows::Window {
 public:
-		Viewport(std::string name);
+		Viewport(std::string name, bool* open);
 
 		virtual void DrawContents() override;
 

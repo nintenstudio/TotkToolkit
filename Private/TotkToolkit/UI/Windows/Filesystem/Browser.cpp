@@ -5,7 +5,7 @@
 #include <imgui.h>
 
 namespace TotkToolkit::UI::Windows::Filesystem {
-    Browser::Browser() : TotkToolkit::UI::Windows::Window(TotkToolkit::UI::Localization::TranslationSource::GetText("BROWSER")) {
+    Browser::Browser(bool* open) : TotkToolkit::UI::Windows::Window(TotkToolkit::UI::Localization::TranslationSource::GetText("BROWSER"), open) {
         mCurrentPath.push_back("Folder1");
         mCurrentPath.push_back("Folder2");
         mCurrentPath.push_back("Folder3");

@@ -6,7 +6,7 @@
 #include <memory>
 
 namespace TotkToolkit::UI::Windows::Rendering {
-	Viewport::Viewport(std::string name) : TotkToolkit::UI::Windows::Window(name), mFramebuffer(std::make_shared<TotkToolkit::Rendering::Framebuffer>(GL_FRAMEBUFFER)) {
+	Viewport::Viewport(std::string name, bool* open) : TotkToolkit::UI::Windows::Window(name, open), mFramebuffer(std::make_shared<TotkToolkit::Rendering::Framebuffer>(GL_FRAMEBUFFER)) {
 		std::shared_ptr<TotkToolkit::Rendering::Texture> texture = std::make_shared<TotkToolkit::Rendering::Texture>();
 		texture->Init2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 		texture->SetParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);

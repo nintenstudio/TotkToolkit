@@ -129,7 +129,7 @@ int main()
 
     TotkToolkit::UI::MainWindow mainWindow;
 
-    TotkToolkit::UI::Windows::Rendering::Viewport viewport("Viewport");
+    TotkToolkit::UI::Windows::Rendering::Viewport viewport("Viewport", nullptr);
 
 	while (!glfwWindowShouldClose(window))
 	{

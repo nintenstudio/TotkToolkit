@@ -5,12 +5,12 @@
 #include <imgui.h>
 
 namespace TotkToolkit::UI::Windows {
-    Window::Window(std::string name) : mName(name), TotkToolkit::UI::ImGuiItem::ImGuiItem() {
+    Window::Window(std::string name, bool* open) : mName(name), mOpen(open), TotkToolkit::UI::ImGuiItem::ImGuiItem() {
 
     }
 
     void Window::Draw() {
-        ImGui::Begin(mName.c_str());
+        ImGui::Begin(mName.c_str(), mOpen);
         DrawContents();
         ImGui::End();
     }

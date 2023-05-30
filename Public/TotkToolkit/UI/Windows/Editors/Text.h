@@ -8,7 +8,7 @@
 namespace TotkToolkit::UI::Windows::Editors {
     class Text : public TotkToolkit::UI::Windows::Window, public TotkToolkit::IO::Editor {
 public:
-        Text(std::string name);
+        Text(std::string name, bool* open);
 
         virtual void DrawContents() override;
 
