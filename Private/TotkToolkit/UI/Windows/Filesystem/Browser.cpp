@@ -13,7 +13,7 @@ namespace TotkToolkit::UI::Windows::Filesystem {
 
     void Browser::DrawContents() {
         //std::string currentPath = "";
-        for (F_UINT i = 0; i < mCurrentPath.size(); i++) {
+        for (F_U32 i = 0; i < mCurrentPath.size(); i++) {
             ImGui::AlignTextToFramePadding();
             ImVec2 folderNameStartPos = ImGui::GetCursorPos();
             ImGui::TextDisabled(mCurrentPath.at(i).c_str());

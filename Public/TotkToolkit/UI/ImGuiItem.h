@@ -23,6 +23,6 @@ protected:
         std::string mId; // ImGui requires unique names for a lot of items it renders. It does, luckily, allow you to append an invisible string at the end of the name for ID purposes. This is something that can be included to differentiate elements from different windows.
     
 private:
-        static F_UINT mIdCounter;
+        static F_U32 mIdCounter;
     };
 }
