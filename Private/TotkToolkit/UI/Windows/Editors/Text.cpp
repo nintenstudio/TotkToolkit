@@ -32,6 +32,7 @@ namespace TotkToolkit::UI::Windows::Editors {
         ImVec2 inputTextSize = windowContentRegionSize;
         inputTextSize.x -= toolbarSize.x;
         inputTextSize.y -= toolbarSize.y;
-        ImGui::InputTextMultiline(ImGuiItem::AppendIdentifier("##InputText").c_str(), &mText, inputTextSize);
+        //ImGui::InputTextMultiline(ImGuiItem::AppendIdentifier("##InputText").c_str(), &mText, inputTextSize);
+        mTextEditor.Render(ImGuiItem::AppendIdentifier("##InputText").c_str());
     }
 }

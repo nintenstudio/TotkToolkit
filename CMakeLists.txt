@@ -67,8 +67,20 @@ target_include_directories(ImGui PUBLIC "Lib/GLFW/include")
 target_include_directories(TotkToolkit PUBLIC Lib/ImGui)
 target_link_libraries(TotkToolkit PUBLIC ImGui)
 
+# Use ImGuiColorTextEdit
+include(${CMAKE_CURRENT_SOURCE_DIR}/ImGuiColorTextEdit.cmake)
+target_include_directories(TotkToolkit PUBLIC Lib/ImGuiColorTextEdit)
+target_link_libraries(TotkToolkit PUBLIC ImGuiColorTextEdit)
+
 # Prefer more modern OpenGL. Especially matters when not building for switch.
 set(OpenGL_GL_PREFERENCE GLVND)
+
+# Make sure we can use multiple thrads.
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_package(Threads REQUIRED)
+
+target_link_libraries(TotkToolkit PUBLIC Threads::Threads)
 
 # Set up for switch if desired
 if (SWITCH)

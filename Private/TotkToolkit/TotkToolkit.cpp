@@ -18,6 +18,9 @@
 #include <TotkToolkit/UI/MainWindow.h>
 #include <TotkToolkit/UI/Windows/Rendering/Viewport.h>
 #include <TotkToolkit/Rendering/RenderingSystem.h>
+#include <TotkToolkit/UI/Windows/Editors/BYML.h>
+
+#include <fstream>
 
 int main()
 {
@@ -129,7 +132,12 @@ int main()
 
     TotkToolkit::UI::MainWindow mainWindow;
 
-    TotkToolkit::UI::Windows::Rendering::Viewport viewport("Viewport", nullptr);
+    TotkToolkit::UI::Windows::Rendering::Viewport viewport("Viewport (TEST WINDOW)", nullptr);
+
+    TotkToolkit::UI::Windows::Editors::BYML bymlEditor("BYML Editor (TEST WINDOW)", nullptr);
+    std::fstream testBYML;
+    testBYML.open("test.byml", std::ios::in | std::ios::out | std::ios::binary);
+    bymlEditor.Parse(&testBYML);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -143,6 +151,7 @@ int main()
         
         mainWindow.Draw();
         viewport.Draw();
+        bymlEditor.Draw();
 
         ImGui::Render();
         int display_w, display_h;
