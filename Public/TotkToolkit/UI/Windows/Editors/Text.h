@@ -11,10 +11,12 @@ namespace TotkToolkit::UI::Windows::Editors {
 public:
         Text(std::string name, bool* open);
 
+        virtual void Draw() override;
         virtual void DrawContents() override;
 
 protected:
-        std::string mText;
+        std::string mSavedText;
         ImGuiColorTextEdit::TextEditor mTextEditor;
+        bool mTextEditorModified;
     };
 }

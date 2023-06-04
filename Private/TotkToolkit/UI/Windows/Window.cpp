@@ -10,7 +10,7 @@ namespace TotkToolkit::UI::Windows {
     }
 
     void Window::Draw() {
-        ImGui::Begin(mName.c_str(), mOpen);
+        ImGui::Begin(AppendIdentifier(mName).c_str(), mOpen);
         DrawContents();
         ImGui::End();
     }

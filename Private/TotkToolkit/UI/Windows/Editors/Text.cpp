@@ -9,6 +9,22 @@ namespace TotkToolkit::UI::Windows::Editors {
         
     }
 
+    void Text::Draw() {
+        if (mTextEditor.IsTextChanged()) {
+            if (mTextEditor.GetText() != mSavedText)
+                mTextEditorModified = true;
+            else
+                mTextEditorModified = false;
+        }
+
+        if (mTextEditorModified)
+            ImGui::Begin(AppendIdentifier(mName + "*").c_str(), mOpen);
+        else
+            ImGui::Begin(AppendIdentifier(mName).c_str(), mOpen);
+        DrawContents();
+        ImGui::End();
+    }
+
     void Text::DrawContents() {
         ImVec2 toolbarCursorStart = ImGui::GetCursorPos();
         // Any sort of toolbar code can be put here.

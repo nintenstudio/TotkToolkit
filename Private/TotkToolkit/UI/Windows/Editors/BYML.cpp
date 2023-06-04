@@ -12,7 +12,8 @@ namespace TotkToolkit::UI::Windows::Editors {
 		if (mBYML == nullptr)
 			return false;
 
-		mTextEditor.SetText(mBYML->ToYAML());
+		mSavedText = mBYML->ToYAML();
+		mTextEditor.SetText(mSavedText);
 
 		return true;
 	}
