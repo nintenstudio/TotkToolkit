@@ -10,8 +10,8 @@ namespace TotkToolkit::UI::Windows::Editors {
     public:
         BYML(std::string name, bool* open);
 
-        virtual bool Parse(std::iostream* stream) override;
-        virtual bool Serialize(std::iostream* stream) override;
+        virtual bool Parse(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) override;
+        virtual bool Serialize(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) override;
 
     protected:
         std::shared_ptr<Formats::Resources::BYML::BYML> mBYML;

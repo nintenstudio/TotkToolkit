@@ -10,8 +10,5 @@ namespace TotkToolkit::UI::Windows::Configuration {
         Settings(bool* open);
 
         virtual void DrawContents() override;
-
-    private:
-        std::string mRomfsDir;
     };
 }

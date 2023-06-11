@@ -5,12 +5,12 @@ namespace TotkToolkit::UI::Windows::Editors {
 
 	}
 
-	bool PlainText::Parse(std::iostream* stream) {
+	bool PlainText::Parse(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) {
 
 		return true;
 	}
 
-	bool PlainText::Serialize(std::iostream* stream) {
+	bool PlainText::Serialize(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) {
 
 		return true;
 	}

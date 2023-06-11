@@ -14,7 +14,7 @@
     endforeach()
 endfunction()
 
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -22,7 +22,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 project (TotkToolkit C CXX)
-add_executable(TotkToolkit "Public/TotkToolkit/TotkToolkit.h" "Private/TotkToolkit/TotkToolkit.cpp" "Public/TotkToolkit/UI/Windows/Window.h" "Private/TotkToolkit/UI/Windows/Window.cpp" "Public/TotkToolkit/UI/ImGuiItem.h" "Public/TotkToolkit/UI/Windows/Filesystem/Browser.h" "Private/TotkToolkit/UI/Windows/Filesystem/Browser.cpp" "Public/TotkToolkit/UI/Localization/TranslationSource.h" "Private/TotkToolkit/UI/ImGuiItem.cpp" "Public/TotkToolkit/UI/MainWindow.h" "Private/TotkToolkit/UI/MainWindow.cpp" "Public/TotkToolkit/UI/Windows/Editors/Text.h" "Private/TotkToolkit/UI/Windows/Editors/Text.cpp" "Public/TotkToolkit/IO/Editor.h" "Public/TotkToolkit/UI/Windows/Editors/PlainText.h" "Private/TotkToolkit/UI/Windows/Editors/PlainText.cpp" "Public/TotkToolkit/UI/Windows/Rendering/Viewport.h" "Private/TotkToolkit/UI/Windows/Rendering/Viewport.cpp" "Public/TotkToolkit/Rendering/Framebuffer.h" "Public/TotkToolkit/Rendering/Texture.h" "Private/TotkToolkit/Rendering/Texture.cpp"  "Private/TotkToolkit/Rendering/Framebuffer.cpp" "Public/TotkToolkit/Rendering/DeviceFeatures.h" "Private/TotkToolkit/Rendering/DeviceFeatures.cpp" "Public/TotkToolkit/Rendering/RenderingSystem.h" "Private/TotkToolkit/Rendering/RenderingSystem.cpp" "Public/TotkToolkit/Rendering/DebugMessageHandler.h" "Private/TotkToolkit/Rendering/DebugMessageHandler.cpp" "Public/TotkToolkit/UI/Windows/Configuration/Settings.h" "Private/TotkToolkit/UI/Windows/Configuration/Settings.cpp" "Public/TotkToolkit/UI/Windows/Editors/BYML.h" "Private/TotkToolkit/UI/Windows/Editors/BYML.cpp")
+add_executable(TotkToolkit "Public/TotkToolkit/TotkToolkit.h" "Private/TotkToolkit/TotkToolkit.cpp" "Public/TotkToolkit/UI/Windows/Window.h" "Private/TotkToolkit/UI/Windows/Window.cpp" "Public/TotkToolkit/UI/ImGuiItem.h" "Public/TotkToolkit/UI/Windows/Filesystem/Browser.h" "Private/TotkToolkit/UI/Windows/Filesystem/Browser.cpp" "Public/TotkToolkit/UI/Localization/TranslationSource.h" "Private/TotkToolkit/UI/ImGuiItem.cpp" "Public/TotkToolkit/UI/MainWindow.h" "Private/TotkToolkit/UI/MainWindow.cpp" "Public/TotkToolkit/UI/Windows/Editors/Text.h" "Private/TotkToolkit/UI/Windows/Editors/Text.cpp" "Public/TotkToolkit/IO/Editor.h" "Public/TotkToolkit/UI/Windows/Editors/PlainText.h" "Private/TotkToolkit/UI/Windows/Editors/PlainText.cpp" "Public/TotkToolkit/UI/Windows/Rendering/Viewport.h" "Private/TotkToolkit/UI/Windows/Rendering/Viewport.cpp" "Public/TotkToolkit/Rendering/Framebuffer.h" "Public/TotkToolkit/Rendering/Texture.h" "Private/TotkToolkit/Rendering/Texture.cpp"  "Private/TotkToolkit/Rendering/Framebuffer.cpp" "Public/TotkToolkit/Rendering/DeviceFeatures.h" "Private/TotkToolkit/Rendering/DeviceFeatures.cpp" "Public/TotkToolkit/Rendering/RenderingSystem.h" "Private/TotkToolkit/Rendering/RenderingSystem.cpp" "Public/TotkToolkit/Rendering/DebugMessageHandler.h" "Private/TotkToolkit/Rendering/DebugMessageHandler.cpp" "Public/TotkToolkit/UI/Windows/Configuration/Settings.h" "Private/TotkToolkit/UI/Windows/Configuration/Settings.cpp" "Public/TotkToolkit/UI/Windows/Editors/BYML.h" "Private/TotkToolkit/UI/Windows/Editors/BYML.cpp" "Public/TotkToolkit/IO/Filesystem.h" "Public/TotkToolkit/IO/Streams/Physfs/Physfs.h" "Private/TotkToolkit/IO/Streams/Physfs/Physfs.cpp" "Public/TotkToolkit/IO/Streams/Physfs/Little.h" "Public/TotkToolkit/IO/Streams/Physfs/Big.h" "Public/TotkToolkit/IO/Streams/Physfs/PhysfsBasic.h" "Private/TotkToolkit/IO/Streams/Physfs/PhysfsBasic.cpp" "Private/TotkToolkit/IO/Filesystem.cpp" "Public/TotkToolkit/Configuration/Settings.h" "Private/TotkToolkit/Configuration/Settings.cpp" "Public/TotkToolkit/Messaging/NoticeBoard.h" "Public/TotkToolkit/Messaging/Receiver.h" "Public/TotkToolkit/Messaging/Notice.h" "Private/TotkToolkit/Messaging/NoticeBoard.cpp" "Public/TotkToolkit/Messaging/NoticeType.h" "Public/TotkToolkit/Messaging/Notices/Configuration/Settings/Change/RomfsDir.h" "Private/TotkToolkit/Messaging/Notices/Configuration/Settings/Change/RomfsDir.cpp"  "Public/TotkToolkit/Messaging/ExternalReceivers/IO/Filesystem.h" "Private/TotkToolkit/Messaging/ExternalReceivers/IO/Filesystem.cpp" "Private/TotkToolkit/Messaging/Notice.cpp" "Public/TotkToolkit/Messaging/Notices/IO/Filesystem/FilesChange.h" "Private/TotkToolkit/Messaging/Notices/IO/Filesystem/FilesChange.cpp")
 set_target_properties(TotkToolkit PROPERTIES APP_TITLE "TotkToolkit" APP_AUTHOR "Me" APP_VERSION "1.0.0" ROMFS "${CMAKE_CURRENT_SOURCE_DIR}/Romfs")
 
 copy_directory_recursive(${CMAKE_CURRENT_SOURCE_DIR}/Romfs/Resources ${CMAKE_CURRENT_BINARY_DIR}/Resources)
@@ -31,7 +31,6 @@ copy_directory_recursive(${CMAKE_CURRENT_SOURCE_DIR}/Romfs/Resources ${CMAKE_CUR
 target_include_directories(TotkToolkit PRIVATE Private Public)
 
 # Use Formats
-target_include_directories(TotkToolkit PUBLIC Lib/Formats/Public Lib/ImGui)
 add_subdirectory(Lib/Formats)
 target_link_libraries(TotkToolkit PUBLIC Formats)
 
@@ -71,6 +70,10 @@ target_link_libraries(TotkToolkit PUBLIC ImGui)
 include(${CMAKE_CURRENT_SOURCE_DIR}/ImGuiColorTextEdit.cmake)
 target_include_directories(TotkToolkit PUBLIC Lib/ImGuiColorTextEdit)
 target_link_libraries(TotkToolkit PUBLIC ImGuiColorTextEdit)
+
+# Use Sarc_Archiver
+add_subdirectory(Lib/Sarc_Archiver)
+target_link_libraries(TotkToolkit PUBLIC sarc_archiver)
 
 # Prefer more modern OpenGL. Especially matters when not building for switch.
 set(OpenGL_GL_PREFERENCE GLVND)
@@ -126,6 +129,3 @@ else()
         target_include_directories(GLAD PUBLIC Lib/EGL-Registry/api)
     endif()
 endif()
-
-# For when Sarc_Arhiver is useful:
-#add_subdirectory(Lib/Sarc_Archiver)

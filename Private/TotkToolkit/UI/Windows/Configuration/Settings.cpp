@@ -1,5 +1,6 @@
 #include <TotkToolkit/UI/Windows/Configuration/Settings.h>
 
+#include <TotkToolkit/Configuration/Settings.h>
 #include <TotkToolkit/UI/Localization/TranslationSource.h>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
@@ -9,6 +10,8 @@ namespace TotkToolkit::UI::Windows::Configuration {
     }
 
     void Settings::DrawContents() {
-        ImGui::InputText(AppendIdentifier("Romfs Dir").c_str(), &mRomfsDir);
+        std::string romfsDir = TotkToolkit::Configuration::Settings::GetRomfsDir();
+        ImGui::InputText(AppendIdentifier("Romfs Dir").c_str(), &romfsDir);
+        TotkToolkit::Configuration::Settings::SetRomfsDir(romfsDir);
     }
 }

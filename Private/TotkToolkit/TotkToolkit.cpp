@@ -19,6 +19,7 @@
 #include <TotkToolkit/UI/Windows/Rendering/Viewport.h>
 #include <TotkToolkit/Rendering/RenderingSystem.h>
 #include <TotkToolkit/UI/Windows/Editors/BYML.h>
+#include <TotkToolkit/IO/Filesystem.h>
 
 #include <fstream>
 
@@ -134,10 +135,8 @@ int main()
 
     TotkToolkit::UI::Windows::Rendering::Viewport viewport("Viewport (TEST WINDOW)", nullptr);
 
-    TotkToolkit::UI::Windows::Editors::BYML bymlEditor("BYML Editor (TEST WINDOW)", nullptr);
-    std::fstream testBYML;
-    testBYML.open("test.byml", std::ios::in | std::ios::out | std::ios::binary);
-    bymlEditor.Parse(&testBYML);
+    TotkToolkit::IO::Filesystem::Init();
+    std::vector<std::string> files = TotkToolkit::IO::Filesystem::EnumerateFiles("Pack/");
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -151,7 +150,6 @@ int main()
         
         mainWindow.Draw();
         viewport.Draw();
-        bymlEditor.Draw();
 
         ImGui::Render();
         int display_w, display_h;

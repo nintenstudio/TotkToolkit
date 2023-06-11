@@ -15,7 +15,7 @@
 	url = https://github.com/devkitPro/switch-glad.git
 [submodule "Lib/Sarc_Archiver"]
 	path = Lib/Sarc_Archiver
-	url = https://github.com/Torphedo/sarc_archiver.git
+	url = https://github.com/nintenstudio/sarc_archiver.git
 [submodule "Lib/EGL-Registry"]
 	path = Lib/EGL-Registry
 	url = https://github.com/KhronosGroup/EGL-Registry.git

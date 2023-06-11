@@ -7,7 +7,7 @@ namespace TotkToolkit::UI::Windows::Editors {
 		mTextEditor.SetLanguageDefinition(ImGuiColorTextEdit::TextEditor::LanguageDefinition::Yaml());
 	}
 
-	bool BYML::Parse(std::iostream* stream) {
+	bool BYML::Parse(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) {
 		mBYML = Formats::Resources::BYML::BYML::Factory(stream);
 		if (mBYML == nullptr)
 			return false;
@@ -18,7 +18,7 @@ namespace TotkToolkit::UI::Windows::Editors {
 		return true;
 	}
 
-	bool BYML::Serialize(std::iostream* stream) {
+	bool BYML::Serialize(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) {
 		mBYML->SetStream(stream);
 		return mBYML->Serialize();
 	}
