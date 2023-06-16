@@ -1,16 +1,16 @@
 #include <TotkToolkit/UI/Windows/Editors/PlainText.h>
 
 namespace TotkToolkit::UI::Windows::Editors {
-	PlainText::PlainText(std::string name, bool* open) : TotkToolkit::UI::Windows::Editors::Text(name, open) {
+	PlainText::PlainText(TotkToolkit::IO::FileHandle fileHandle, std::string name, bool* open) : TotkToolkit::UI::Windows::Editors::Text(fileHandle, name, open) {
 
 	}
 
-	bool PlainText::Parse(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) {
+	bool PlainText::Parse() {
 
 		return true;
 	}
 
-	bool PlainText::Serialize(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) {
+	bool PlainText::Serialize() {
 
 		return true;
 	}

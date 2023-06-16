@@ -1,11 +1,11 @@
 #pragma once
 
-#include <TotkToolkit/UI/Windows/Window.h>
+#include <TotkToolkit/UI/Window.h>
 
 #include <string>
 
 namespace TotkToolkit::UI::Windows::Configuration {
-    class Settings : public TotkToolkit::UI::Windows::Window {
+    class Settings : public TotkToolkit::UI::Window {
     public:
         Settings(bool* open);
 

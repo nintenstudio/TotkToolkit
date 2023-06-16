@@ -5,9 +5,9 @@
 namespace TotkToolkit::UI::Windows::Editors {
     class PlainText : public TotkToolkit::UI::Windows::Editors::Text {
 public:
-        PlainText(std::string name, bool* open);
+        PlainText(TotkToolkit::IO::FileHandle fileHandle, std::string name, bool* open);
 
-        virtual bool Parse(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) override;
-        virtual bool Serialize(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) override;
+        virtual bool Parse() override;
+        virtual bool Serialize() override;
     };
 }

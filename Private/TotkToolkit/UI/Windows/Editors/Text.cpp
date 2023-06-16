@@ -5,7 +5,7 @@
 #include <misc/cpp/imgui_stdlib.h>
 
 namespace TotkToolkit::UI::Windows::Editors {
-    Text::Text(std::string name, bool* open) : TotkToolkit::UI::Windows::Window(name, open) {
+    Text::Text(TotkToolkit::IO::FileHandle fileHandle, std::string name, bool* open) : TotkToolkit::UI::Windows::Editor(fileHandle, name, open) {
         
     }
 
@@ -17,11 +17,14 @@ namespace TotkToolkit::UI::Windows::Editors {
                 mTextEditorModified = false;
         }
 
+        bool unCollapsed;
         if (mTextEditorModified)
-            ImGui::Begin(AppendIdentifier(mName + "*").c_str(), mOpen);
+            unCollapsed = ImGui::Begin(AppendExclusiveIdentifier(mName + "*").c_str(), mOpen);
         else
-            ImGui::Begin(AppendIdentifier(mName).c_str(), mOpen);
-        DrawContents();
+            unCollapsed = ImGui::Begin(AppendExclusiveIdentifier(mName).c_str(), mOpen);
+        if (unCollapsed) {
+            DrawContents();
+        }
         ImGui::End();
     }
 

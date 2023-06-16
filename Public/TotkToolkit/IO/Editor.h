@@ -1,12 +1,17 @@
 #pragma once
 
-#include <TotkToolkit/IO/Streams/Physfs/PhysfsBasic.h>
+#include <TotkToolkit/IO/FileHandle.h>
 #include <memory>
 
 namespace TotkToolkit::IO {
 	class Editor {
 	public:
-		virtual bool Parse(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) = 0;
-		virtual bool Serialize(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) = 0;
+		Editor(TotkToolkit::IO::FileHandle fileHandle);
+
+		virtual bool Parse() = 0;
+		virtual bool Serialize() = 0;
+
+	protected:
+		TotkToolkit::IO::FileHandle mFileHandle;
 	};
 }

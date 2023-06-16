@@ -3,8 +3,11 @@
 #include <Formats/Aliases/Primitives.h>
 
 namespace TotkToolkit::UI {
-    std::string ImGuiItem::AppendIdentifier(std::string text) {
-        return text + "###" + mId;
+    std::string ImGuiItem::AppendIdentifier(std::string text, std::string additionalIdentification) {
+        return text + "##" + additionalIdentification + mId;
+    }
+    std::string ImGuiItem::AppendExclusiveIdentifier(std::string text, std::string additionalIdentification) {
+        return text + "###" + additionalIdentification + mId;
     }
 
     F_U32 ImGuiItem::mIdCounter = 0;

@@ -7,13 +7,13 @@
 namespace TotkToolkit::IO::Streams::Physfs {
 	class Little : public TotkToolkit::IO::Streams::Physfs::Physfs {
 	public:
-		Little(PHYSFS_File file) : TotkToolkit::IO::Streams::Physfs::Physfs(file) {
+		Little(PHYSFS_File* file) : TotkToolkit::IO::Streams::Physfs::Physfs(file) {
 
 		}
 
 	protected:
 		virtual void ReadBytesWithEndian(void* out, PHYSFS_uint64 length) override {
-			PHYSFS_readBytes(&mFile, out, length);
+			PHYSFS_readBytes(mFile, out, length);
 #if (FORMATS_BIGENDIAN)
 			std::reverse(reinterpret_cast<F_U8*>(out), reinterpret_cast<F_U8*>(out) + length);
 #endif
@@ -25,7 +25,7 @@ namespace TotkToolkit::IO::Streams::Physfs {
 			std::reverse(reinterpret_cast<F_U8*>(reversed), reinterpret_cast<F_U8*>(reversed) + length);
 			PHYSFS_writeBytes(&mFile, reversed, length);
 #else
-			PHYSFS_writeBytes(&mFile, in, length);
+			PHYSFS_writeBytes(mFile, in, length);
 #endif
 		}
 	};

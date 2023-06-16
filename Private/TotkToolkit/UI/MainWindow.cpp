@@ -1,11 +1,16 @@
 #include <TotkToolkit/UI/MainWindow.h>
 
 #include <TotkToolkit/UI/Localization/TranslationSource.h>
+#include <TotkToolkit/Messaging/NoticeBoard.h>
 #include <imgui.h>
+
+// TODO: Actually implement file opening system.
+#include <TotkToolkit/UI/Windows/Editors/BYML.h>
+#include <TotkToolkit/IO/Filesystem.h>
 
 namespace TotkToolkit::UI {
     MainWindow::MainWindow() : TotkToolkit::UI::ImGuiItem::ImGuiItem(), mBrowser(&mBrowserOpen), mSettings(&mSettingsOpen) {
-
+        TotkToolkit::Messaging::NoticeBoard::AddReceiver(this);
     }
 
     void MainWindow::Draw() {
@@ -32,5 +37,16 @@ namespace TotkToolkit::UI {
             mBrowser.Draw();
         if (mSettingsOpen)
             mSettings.Draw();
+
+        for (std::shared_ptr<TotkToolkit::UI::Window> window : mEditors) {
+            window->Draw();
+        }
+    }
+
+    void MainWindow::HandleNotice(std::shared_ptr<TotkToolkit::Messaging::Notice> notice) {
+        switch (notice->mType){
+            default:
+                return;
+        }
     }
 }

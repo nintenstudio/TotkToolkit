@@ -5,7 +5,7 @@
 #include <cassert>
 
 namespace TotkToolkit::IO::Streams::Physfs {
-	PhysfsBasic::PhysfsBasic(PHYSFS_File file) : mFile(file) {
+	PhysfsBasic::PhysfsBasic(PHYSFS_File* file) : mFile(file) {
 
 	}
 
@@ -21,10 +21,10 @@ namespace TotkToolkit::IO::Streams::Physfs {
 	}
 
 	void PhysfsBasic::ReadBytes(void* out, F_U32 length) {
-		PHYSFS_readBytes(&mFile, out, length);
+		PHYSFS_readBytes(mFile, out, length);
 	}
 
 	void PhysfsBasic::WriteBytes(const void* in, F_U32 length) {
-		PHYSFS_writeBytes(&mFile, in, length);
+		PHYSFS_writeBytes(mFile, in, length);
 	}
 }

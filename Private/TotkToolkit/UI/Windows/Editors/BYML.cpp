@@ -3,12 +3,12 @@
 #include <imgui.h>
 
 namespace TotkToolkit::UI::Windows::Editors {
-	BYML::BYML(std::string name, bool* open) : TotkToolkit::UI::Windows::Editors::Text(name, open) {
+	BYML::BYML(TotkToolkit::IO::FileHandle fileHandle, std::string name, bool* open) : TotkToolkit::UI::Windows::Editors::Text(fileHandle, name, open) {
 		mTextEditor.SetLanguageDefinition(ImGuiColorTextEdit::TextEditor::LanguageDefinition::Yaml());
 	}
 
-	bool BYML::Parse(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) {
-		mBYML = Formats::Resources::BYML::BYML::Factory(stream);
+	bool BYML::Parse() {
+		mBYML = Formats::Resources::BYML::BYML::Factory(mFileHandle.GetReadStream());
 		if (mBYML == nullptr)
 			return false;
 
@@ -18,8 +18,8 @@ namespace TotkToolkit::UI::Windows::Editors {
 		return true;
 	}
 
-	bool BYML::Serialize(std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream) {
-		mBYML->SetStream(stream);
+	bool BYML::Serialize() {
+		mBYML->SetStream(mFileHandle.GetWriteStream());
 		return mBYML->Serialize();
 	}
 }

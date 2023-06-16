@@ -18,7 +18,8 @@
 #include <TotkToolkit/UI/MainWindow.h>
 #include <TotkToolkit/UI/Windows/Rendering/Viewport.h>
 #include <TotkToolkit/Rendering/RenderingSystem.h>
-#include <TotkToolkit/UI/Windows/Editors/BYML.h>
+#include <TotkToolkit/UI/EditorSystem.h>
+#include <TotkToolkit/UI/Fonts.h>
 #include <TotkToolkit/IO/Filesystem.h>
 
 #include <fstream>
@@ -117,10 +118,64 @@ int main()
 
     // Load fonts
 #if (SWITCH)
-    ImGui::GetIO().Fonts->AddFontFromFileTTF("romfs:/Resources/Fonts/Roboto.ttf", 24.f);
+    float fontSize = 24.f;
+
+    ImFontConfig config;
+
+    // 1x size font
+    config.GlyphOffset = ImVec2(0, 0);
+    config.MergeMode = false;
+    config.PixelSnapH = false;
+    TotkToolkit::UI::Fonts::sNormalFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("romfs:/Resources/Fonts/Roboto.ttf", fontSize, &config);
+
+    config.MergeMode = true;
+    config.PixelSnapH = true;
+    config.GlyphOffset = ImVec2(0, 0.1875 * fontSize);
+    ImWchar iconRanges[] = { 0xe000, 0xe0fe, 0 };
+    ImGui::GetIO().Fonts->AddFontFromFileTTF("romfs:/Resources/Fonts/OpenFontIcons.ttf", fontSize, &config, iconRanges);
+
+    // 2x size font
+    config.GlyphOffset = ImVec2(0, 0);
+    config.MergeMode = false;
+    config.PixelSnapH = false;
+    TotkToolkit::UI::Fonts::sNormalFont2x = ImGui::GetIO().Fonts->AddFontFromFileTTF("romfs:/Resources/Fonts/Roboto.ttf", fontSize * 2);
+
+    config.GlyphOffset = ImVec2(0, 0.1875 * fontSize * 2);
+    config.MergeMode = true;
+    config.PixelSnapH = true;
+    ImWchar iconRanges2x[] = { 0xe000, 0xe0fe, 0 };
+    ImGui::GetIO().Fonts->AddFontFromFileTTF("romfs:/Resources/Fonts/OpenFontIcons.ttf", fontSize * 2, &config, iconRanges2x);
 #else
-    ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/Roboto.ttf", 16.f);
+    float fontSize = 16.f;
+
+    ImFontConfig config;
+
+    // 1x size font
+    config.GlyphOffset = ImVec2(0, 0);
+    config.MergeMode = false;
+    config.PixelSnapH = false;
+    TotkToolkit::UI::Fonts::sNormalFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/Roboto.ttf", fontSize, &config);
+    
+    config.MergeMode = true;
+    config.PixelSnapH = true;
+    config.GlyphOffset = ImVec2(0, 0.1875 * fontSize);
+    ImWchar iconRanges[] = {0xe000, 0xe0fe, 0};
+    ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/OpenFontIcons.ttf", fontSize, &config, iconRanges);
+
+    // 2x size font
+    config.GlyphOffset = ImVec2(0, 0);
+    config.MergeMode = false;
+    config.PixelSnapH = false;
+    TotkToolkit::UI::Fonts::sNormalFont2x = ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/Roboto.ttf", fontSize * 2);
+
+    config.GlyphOffset = ImVec2(0, 0.1875 * fontSize * 2);
+    config.MergeMode = true;
+    config.PixelSnapH = true;
+    ImWchar iconRanges2x[] = { 0xe000, 0xe0fe, 0 };
+    ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/OpenFontIcons.ttf", fontSize * 2, &config, iconRanges2x);
 #endif
+
+    assert(ImGui::GetIO().Fonts->Build());
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -136,7 +191,7 @@ int main()
     TotkToolkit::UI::Windows::Rendering::Viewport viewport("Viewport (TEST WINDOW)", nullptr);
 
     TotkToolkit::IO::Filesystem::Init();
-    std::vector<std::string> files = TotkToolkit::IO::Filesystem::EnumerateFiles("Pack/");
+    TotkToolkit::UI::EditorSystem::Init();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -150,6 +205,7 @@ int main()
         
         mainWindow.Draw();
         viewport.Draw();
+        TotkToolkit::UI::EditorSystem::Draw();
 
         ImGui::Render();
         int display_w, display_h;

@@ -5,8 +5,8 @@
 namespace TotkToolkit::Messaging {
 	class Notice {
 	public:
-		Notice(TotkToolkit::Messaging::NoticeType noticeType);
+		Notice(TotkToolkit::Messaging::NoticeType type);
 
-		TotkToolkit::Messaging::NoticeType mNoticeType;
+		TotkToolkit::Messaging::NoticeType mType;
 	};
 }

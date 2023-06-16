@@ -1,15 +1,15 @@
 #pragma once
 
-#include <TotkToolkit/UI/Windows/Window.h>
-#include <TotkToolkit/IO/Editor.h>
+#include <TotkToolkit/UI/Window.h>
+#include <TotkToolkit/UI/Windows/Editor.h>
 
 #include <string>
 #include <TextEditor.h>
 
 namespace TotkToolkit::UI::Windows::Editors {
-    class Text : public TotkToolkit::UI::Windows::Window, public TotkToolkit::IO::Editor {
+    class Text : public TotkToolkit::UI::Windows::Editor {
 public:
-        Text(std::string name, bool* open);
+        Text(TotkToolkit::IO::FileHandle fileHandle, std::string name, bool* open);
 
         virtual void Draw() override;
         virtual void DrawContents() override;

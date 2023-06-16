@@ -14,8 +14,11 @@ namespace TotkToolkit::IO {
 		static void MountDir(std::string dir);
 		static void UnmountDir(std::string dir);
 
-		static std::shared_ptr<Formats::IO::BinaryIOStreamBasic> GetStream(std::string filepath);
+		static std::shared_ptr<Formats::IO::BinaryIOStreamBasic> GetReadStream(std::string filepath);
+		static std::shared_ptr<Formats::IO::BinaryIOStreamBasic> GetWriteStream(std::string filepath);
+
 		static std::vector<std::string> EnumerateFiles(std::string path);
+		static std::vector<std::string> EnumerateDirectories(std::string path);
 
 	protected:
 		static TotkToolkit::Messaging::ExternalReceivers::IO::Filesystem sExternalReceiver;
