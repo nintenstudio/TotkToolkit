@@ -86,7 +86,7 @@ namespace TotkToolkit::UI::Windows::Filesystem {
 
                             if (ImGui::MenuItem("BYML Text")) {
                                 std::string currentFilePath = GetCurrentPath() + mCurrentFiles[i];
-                                std::shared_ptr<TotkToolkit::UI::Windows::Editors::BYML> editor = std::make_shared<TotkToolkit::UI::Windows::Editors::BYML>(TotkToolkit::IO::FileHandle::FileHandle(currentFilePath), mCurrentFiles[i], nullptr);
+                                std::shared_ptr<TotkToolkit::UI::Windows::Editors::BYML> editor = std::make_shared<TotkToolkit::UI::Windows::Editors::BYML>(TotkToolkit::IO::FileHandle(currentFilePath), mCurrentFiles[i], nullptr);
                                 std::shared_ptr<Formats::IO::BinaryIOStreamBasic> fileStream = TotkToolkit::IO::Filesystem::GetReadStream(currentFilePath);
                                 editor->Parse();
                                 TotkToolkit::UI::EditorSystem::AddEditor(editor);

@@ -27,7 +27,9 @@ set_target_properties(TotkToolkit PROPERTIES APP_TITLE "TotkToolkit" APP_AUTHOR 
 
 copy_directory_recursive(${CMAKE_CURRENT_SOURCE_DIR}/Romfs/Resources ${CMAKE_CURRENT_BINARY_DIR}/Resources)
 
+if (MSVC)
 target_compile_options(TotkToolkit PUBLIC "/utf-8")
+endif()
 
 # Include this
 target_include_directories(TotkToolkit PRIVATE Private Public)
@@ -74,6 +76,7 @@ target_include_directories(TotkToolkit PUBLIC Lib/ImGuiColorTextEdit)
 target_link_libraries(TotkToolkit PUBLIC ImGuiColorTextEdit)
 
 # Use Sarc_Archiver
+set(PHYSFS_TARGETNAME_UNINSTALL "physfs_uninstall" CACHE STRING "" FORCE) # Avoid conflicting uninstall targets
 add_subdirectory(Lib/Sarc_Archiver)
 target_link_libraries(TotkToolkit PUBLIC sarc_archiver)
 

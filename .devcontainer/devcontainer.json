@@ -10,6 +10,19 @@
         },
         "nintenstudio/GLFW": {
           "permissions": "write-all"
+        },
+
+        "nintenstudio/sarc_archiver": {
+          "permissions": "write-all"
+        },
+        "nintenstudio/physfs": {
+          "permissions": "write-all"
+        },
+        "nintenstudio/ImGuiColorTextEdit": {
+          "permissions": "write-all"
+        },
+        "nintenstudio/Switch-CMake": {
+          "permissions": "write-all"
         }
       }
     }

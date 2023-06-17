@@ -27,8 +27,10 @@ namespace TotkToolkit::Rendering {
 	void DebugMessageHandler::Init() {
 #ifndef NDEBUG
         std::freopen("TotkToolkit.log", "w", stderr);
-		glEnable(GL_DEBUG_OUTPUT);
-		glDebugMessageCallback(DebugMessageCallback, 0);
+        if (glDebugMessageCallback != nullptr) {
+		    glEnable(GL_DEBUG_OUTPUT);
+		    glDebugMessageCallback(DebugMessageCallback, 0);
+        }
 #endif
 	}
 }
