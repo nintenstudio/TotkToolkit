@@ -10,8 +10,12 @@ namespace TotkToolkit::UI::Windows::Configuration {
     }
 
     void Settings::DrawContents() {
-        std::string romfsDir = TotkToolkit::Configuration::Settings::GetRomfsDir();
+        std::string romfsDir = TotkToolkit::Configuration::Settings::GetDumpDir();
         ImGui::InputText(AppendIdentifier(TotkToolkit::UI::Localization::TranslationSource::GetText("GAME_DUMP_DIR")).c_str(), &romfsDir);
-        TotkToolkit::Configuration::Settings::SetRomfsDir(romfsDir);
+        TotkToolkit::Configuration::Settings::SetDumpDir(romfsDir);
+
+        std::string writeDir = TotkToolkit::Configuration::Settings::GetWriteDir();
+        ImGui::InputText(AppendIdentifier(TotkToolkit::UI::Localization::TranslationSource::GetText("WRITE_DIR")).c_str(), &writeDir);
+        TotkToolkit::Configuration::Settings::SetWriteDir(writeDir);
     }
 }

@@ -3,6 +3,7 @@
 #include <TotkToolkit/UI/ImGuiItem.h>
 
 #include <string>
+#include <imgui.h>
 
 namespace TotkToolkit::UI {
     class Window : public TotkToolkit::UI::ImGuiItem {
@@ -16,6 +17,7 @@ public:
 
 protected:
         std::string mName;
+        ImGuiWindowFlags mWindowFlags;
         bool* mOpen;
         bool mOpenLocal;
     };

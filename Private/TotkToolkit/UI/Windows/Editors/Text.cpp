@@ -19,9 +19,9 @@ namespace TotkToolkit::UI::Windows::Editors {
 
         bool unCollapsed;
         if (mTextEditorModified)
-            unCollapsed = ImGui::Begin(AppendExclusiveIdentifier(mName + "*").c_str(), mOpen);
+            unCollapsed = ImGui::Begin(AppendExclusiveIdentifier(mName + "*").c_str(), mOpen, mWindowFlags);
         else
-            unCollapsed = ImGui::Begin(AppendExclusiveIdentifier(mName).c_str(), mOpen);
+            unCollapsed = ImGui::Begin(AppendExclusiveIdentifier(mName).c_str(), mOpen, mWindowFlags);
         if (unCollapsed) {
             DrawContents();
         }
@@ -29,6 +29,8 @@ namespace TotkToolkit::UI::Windows::Editors {
     }
 
     void Text::DrawContents() {
+        TotkToolkit::UI::Windows::Editor::DrawContents();
+        
         ImVec2 toolbarCursorStart = ImGui::GetCursorPos();
         // Any sort of toolbar code can be put here.
         ImVec2 toolbarCursorEnd = ImGui::GetCursorPos();

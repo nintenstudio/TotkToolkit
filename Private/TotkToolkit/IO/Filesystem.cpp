@@ -6,6 +6,29 @@
 #include <archiver_sarc.h>
 #include <physfs.h>
 #include <filesystem>
+#include <vector>
+#include <regex>
+
+struct SearchFilenamesCallbackData {
+	SearchFilenamesCallbackData(std::string regex) : mRegex(regex), mRetPaths() {
+
+	}
+
+	std::string mRegex;
+	std::vector<std::string> mRetPaths;
+};
+
+PHYSFS_EnumerateCallbackResult searchFilenamesCallback(void *data, const char *origdir, const char *fname) {
+	SearchFilenamesCallbackData* callbackData = reinterpret_cast<SearchFilenamesCallbackData*>(data);
+
+	std::regex regex(callbackData->mRegex, std::regex_constants::ECMAScript | std::regex_constants::icase);
+
+	if (std::regex_search(fname, regex)) {
+		callbackData->mRetPaths.push_back(std::filesystem::path(origdir) / std::filesystem::path(fname));
+	}
+
+	return PHYSFS_EnumerateCallbackResult::PHYSFS_ENUM_OK;
+}
 
 namespace TotkToolkit::IO {
 	void Filesystem::Init() {
@@ -14,14 +37,20 @@ namespace TotkToolkit::IO {
 		TotkToolkit::Messaging::NoticeBoard::AddReceiver(&sExternalReceiver);
 	}
 
-	void Filesystem::MountDir(std::string dir) {
-		PHYSFS_mount(dir.c_str(), "", true);
-		TotkToolkit::Messaging::NoticeBoard::AddNotice(std::make_shared<TotkToolkit::Messaging::Notices::IO::Filesystem::FilesChange>());
-	}
+	void Filesystem::Mount(std::string path) {
+		if(PHYSFS_mount(path.c_str(), "", true)) {
+			//std::vector<std::string> packs = SearchFilenames("", "*.pack");
 
-	void Filesystem::UnmountDir(std::string dir) {
-		PHYSFS_unmount(dir.c_str());
-		TotkToolkit::Messaging::NoticeBoard::AddNotice(std::make_shared<TotkToolkit::Messaging::Notices::IO::Filesystem::FilesChange>());
+
+			TotkToolkit::Messaging::NoticeBoard::AddNotice(std::make_shared<TotkToolkit::Messaging::Notices::IO::Filesystem::FilesChange>());
+		}
+	}
+	void Filesystem::Unmount(std::string path) {
+		if (PHYSFS_unmount(path.c_str()))
+			TotkToolkit::Messaging::NoticeBoard::AddNotice(std::make_shared<TotkToolkit::Messaging::Notices::IO::Filesystem::FilesChange>());
+	}
+	void Filesystem::SetWriteDir(std::string dir) {
+		PHYSFS_setWriteDir(dir.c_str());
 	}
 
 	std::shared_ptr<Formats::IO::BinaryIOStreamBasic> Filesystem::GetReadStream(std::string filepath) {
@@ -46,7 +75,6 @@ namespace TotkToolkit::IO {
 
 		return res;
 	}
-
 	std::vector<std::string> Filesystem::EnumerateDirectories(std::string path) {
 		std::vector<std::string> res;
 
@@ -59,6 +87,13 @@ namespace TotkToolkit::IO {
 		}
 
 		return res;
+	}
+	std::vector<std::string> Filesystem::SearchFilenames(std::string dir, std::string regex) {
+		SearchFilenamesCallbackData callbackRes(regex);
+
+		PHYSFS_enumerate(dir.c_str(), searchFilenamesCallback, &callbackRes);
+
+		return callbackRes.mRetPaths;
 	}
 
 	TotkToolkit::Messaging::ExternalReceivers::IO::Filesystem Filesystem::sExternalReceiver;

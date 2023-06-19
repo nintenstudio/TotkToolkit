@@ -1,17 +1,24 @@
 #include <TotkToolkit/Messaging/ExternalReceivers/IO/Filesystem.h>
 
 #include <TotkToolkit/IO/Filesystem.h>
-#include <TotkToolkit/Messaging/Notices/Configuration/Settings/Change/RomfsDir.h>
+#include <TotkToolkit/Messaging/Notices/Configuration/Settings/Change/DumpDir.h>
+#include <TotkToolkit/Messaging/Notices/Configuration/Settings/Change/WriteDir.h>
 
 namespace TotkToolkit::Messaging::ExternalReceivers::IO {
 	void Filesystem::HandleNotice(std::shared_ptr<TotkToolkit::Messaging::Notice> notice) {
 		switch (notice->mType) {
-			case TotkToolkit::Messaging::NoticeType::CONFIGURATION_SETTINGS_CHANGE_ROMFSDIR: {
-				std::shared_ptr<TotkToolkit::Messaging::Notices::Configuration::Settings::Change::RomfsDir> castNotice = std::static_pointer_cast<TotkToolkit::Messaging::Notices::Configuration::Settings::Change::RomfsDir>(notice);
+			case TotkToolkit::Messaging::NoticeType::CONFIGURATION_SETTINGS_CHANGE_DUMPDIR: {
+					std::shared_ptr<TotkToolkit::Messaging::Notices::Configuration::Settings::Change::DumpDir> castNotice = std::static_pointer_cast<TotkToolkit::Messaging::Notices::Configuration::Settings::Change::DumpDir>(notice);
 
-				TotkToolkit::IO::Filesystem::UnmountDir(castNotice->mOldRomfsDir);
-				TotkToolkit::IO::Filesystem::MountDir(castNotice->mNewRomfsDir);
-				return;
+					TotkToolkit::IO::Filesystem::Unmount(castNotice->mOldDumpDir);
+					TotkToolkit::IO::Filesystem::Mount(castNotice->mNewDumpDir);
+					return;
+				}
+			case TotkToolkit::Messaging::NoticeType::CONFIGURATION_SETTINGS_CHANGE_WRITEDIR: {
+					std::shared_ptr<TotkToolkit::Messaging::Notices::Configuration::Settings::Change::WriteDir> castNotice = std::static_pointer_cast<TotkToolkit::Messaging::Notices::Configuration::Settings::Change::WriteDir>(notice);
+
+					TotkToolkit::IO::Filesystem::SetWriteDir(castNotice->mNewWriteDir);
+					return;
 				}
 			default:
 				return;
