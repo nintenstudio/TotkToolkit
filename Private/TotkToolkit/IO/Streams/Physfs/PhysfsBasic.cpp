@@ -23,8 +23,14 @@ namespace TotkToolkit::IO::Streams::Physfs {
 	void PhysfsBasic::ReadBytes(void* out, F_U32 length) {
 		PHYSFS_readBytes(mFile, out, length);
 	}
-
 	void PhysfsBasic::WriteBytes(const void* in, F_U32 length) {
 		PHYSFS_writeBytes(mFile, in, length);
+	}
+
+	F_U8* PhysfsBasic::GetBuffer() {
+
+	}
+	F_U64 PhysfsBasic::GetBufferLength() {
+		return PHYSFS_get
 	}
 }

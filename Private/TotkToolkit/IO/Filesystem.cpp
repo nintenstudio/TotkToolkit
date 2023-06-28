@@ -20,11 +20,19 @@ struct SearchFilenamesCallbackData {
 
 PHYSFS_EnumerateCallbackResult searchFilenamesCallback(void *data, const char *origdir, const char *fname) {
 	SearchFilenamesCallbackData* callbackData = reinterpret_cast<SearchFilenamesCallbackData*>(data);
+	std::string filePath = (std::filesystem::path(origdir) / std::filesystem::path(fname)).generic_string().c_str();
 
-	std::regex regex(callbackData->mRegex, std::regex_constants::ECMAScript | std::regex_constants::icase);
+	std::regex regex(callbackData->mRegex.c_str(), std::regex_constants::ECMAScript | std::regex_constants::icase);
+
+	if (std::string(fname).ends_with(".pack.zs"))
+		int test = 5;
 
 	if (std::regex_search(fname, regex)) {
-		callbackData->mRetPaths.push_back(std::filesystem::path(origdir) / std::filesystem::path(fname));
+		callbackData->mRetPaths.push_back(filePath);
+	}
+
+	if (PHYSFS_isDirectory(filePath.c_str())) {
+		PHYSFS_enumerate(filePath.c_str(), searchFilenamesCallback, callbackData);
 	}
 
 	return PHYSFS_EnumerateCallbackResult::PHYSFS_ENUM_OK;
@@ -38,9 +46,10 @@ namespace TotkToolkit::IO {
 	}
 
 	void Filesystem::Mount(std::string path) {
-		if(PHYSFS_mount(path.c_str(), "", true)) {
-			//std::vector<std::string> packs = SearchFilenames("", "*.pack");
-
+		if (PHYSFS_mount(path.c_str(), "", true)) {
+			std::vector<std::string> packPaths = SearchFilenames("", R"(\.pack\.zs$)");
+			for (std::string packPath : packPaths)
+				PHYSFS_mount((std::filesystem::path(PHYSFS_getRealDir(packPath.c_str())) / std::filesystem::path(packPath)).generic_string().c_str(), "", true);
 
 			TotkToolkit::Messaging::NoticeBoard::AddNotice(std::make_shared<TotkToolkit::Messaging::Notices::IO::Filesystem::FilesChange>());
 		}
