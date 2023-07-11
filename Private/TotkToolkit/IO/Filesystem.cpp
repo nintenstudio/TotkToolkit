@@ -8,9 +8,10 @@
 #include <filesystem>
 #include <vector>
 #include <regex>
+#include <iostream>
 
-struct SearchFilenamesCallbackData {
-	SearchFilenamesCallbackData(std::string regex) : mRegex(regex), mRetPaths() {
+struct SearchFilenamesByRegexCallbackData {
+	SearchFilenamesByRegexCallbackData(std::string regex) : mRegex(regex), mRetPaths() {
 
 	}
 
@@ -18,21 +19,44 @@ struct SearchFilenamesCallbackData {
 	std::vector<std::string> mRetPaths;
 };
 
-PHYSFS_EnumerateCallbackResult searchFilenamesCallback(void *data, const char *origdir, const char *fname) {
-	SearchFilenamesCallbackData* callbackData = reinterpret_cast<SearchFilenamesCallbackData*>(data);
+PHYSFS_EnumerateCallbackResult searchFilenamesByRegexCallback(void *data, const char *origdir, const char *fname) {
+	SearchFilenamesByRegexCallbackData* callbackData = reinterpret_cast<SearchFilenamesByRegexCallbackData*>(data);
 	std::string filePath = (std::filesystem::path(origdir) / std::filesystem::path(fname)).generic_string().c_str();
 
 	std::regex regex(callbackData->mRegex.c_str(), std::regex_constants::ECMAScript | std::regex_constants::icase);
 
 	if (std::string(fname).ends_with(".pack.zs"))
-		int test = 5;
+		callbackData->mRetPaths.push_back(filePath);
 
 	if (std::regex_search(fname, regex)) {
 		callbackData->mRetPaths.push_back(filePath);
 	}
 
 	if (PHYSFS_isDirectory(filePath.c_str())) {
-		PHYSFS_enumerate(filePath.c_str(), searchFilenamesCallback, callbackData);
+		PHYSFS_enumerate(filePath.c_str(), searchFilenamesByRegexCallback, callbackData);
+	}
+
+	return PHYSFS_EnumerateCallbackResult::PHYSFS_ENUM_OK;
+}
+
+struct SearchFilenamesByExtensionCallbackData {
+	SearchFilenamesByExtensionCallbackData(std::string extension) : mExtension(extension), mRetPaths() {
+
+	}
+
+	std::string mExtension;
+	std::vector<std::string> mRetPaths;
+};
+
+PHYSFS_EnumerateCallbackResult searchFilenamesByExtensionCallback(void *data, const char *origdir, const char *fname) {
+	SearchFilenamesByExtensionCallbackData* callbackData = reinterpret_cast<SearchFilenamesByExtensionCallbackData*>(data);
+	std::string filePath = (std::filesystem::path(origdir) / std::filesystem::path(fname)).generic_string().c_str();
+
+	if (std::string(fname).ends_with(callbackData->mExtension))
+		callbackData->mRetPaths.push_back(filePath);
+
+	if (PHYSFS_isDirectory(filePath.c_str())) {
+		PHYSFS_enumerate(filePath.c_str(), searchFilenamesByExtensionCallback, callbackData);
 	}
 
 	return PHYSFS_EnumerateCallbackResult::PHYSFS_ENUM_OK;
@@ -47,10 +71,6 @@ namespace TotkToolkit::IO {
 
 	void Filesystem::Mount(std::string path) {
 		if (PHYSFS_mount(path.c_str(), "", true)) {
-			std::vector<std::string> packPaths = SearchFilenames("", R"(\.pack\.zs$)");
-			for (std::string packPath : packPaths)
-				PHYSFS_mount((std::filesystem::path(PHYSFS_getRealDir(packPath.c_str())) / std::filesystem::path(packPath)).generic_string().c_str(), "", true);
-
 			TotkToolkit::Messaging::NoticeBoard::AddNotice(std::make_shared<TotkToolkit::Messaging::Notices::IO::Filesystem::FilesChange>());
 		}
 	}
@@ -69,6 +89,9 @@ namespace TotkToolkit::IO {
 	std::shared_ptr<Formats::IO::BinaryIOStreamBasic> Filesystem::GetWriteStream(std::string filepath) {
 		PHYSFS_File* file = PHYSFS_openWrite(filepath.c_str());
 		return std::make_shared<TotkToolkit::IO::Streams::Physfs::PhysfsBasic>(file);
+	}
+	std::string Filesystem::GetRealDir(std::string filePath) {
+		return PHYSFS_getRealDir(filePath.c_str());
 	}
 
 	std::vector<std::string> Filesystem::EnumerateFiles(std::string path) {
@@ -97,10 +120,17 @@ namespace TotkToolkit::IO {
 
 		return res;
 	}
-	std::vector<std::string> Filesystem::SearchFilenames(std::string dir, std::string regex) {
-		SearchFilenamesCallbackData callbackRes(regex);
+	std::vector<std::string> Filesystem::SearchFilenamesByRegex(std::string dir, std::string regex) {
+		SearchFilenamesByRegexCallbackData callbackRes(regex);
 
-		PHYSFS_enumerate(dir.c_str(), searchFilenamesCallback, &callbackRes);
+		PHYSFS_enumerate(dir.c_str(), searchFilenamesByRegexCallback, &callbackRes);
+
+		return callbackRes.mRetPaths;
+	}
+	std::vector<std::string> Filesystem::SearchFilenamesByExtension(std::string dir, std::string extension) {
+		SearchFilenamesByExtensionCallbackData callbackRes(extension);
+
+		PHYSFS_enumerate(dir.c_str(), searchFilenamesByExtensionCallback, &callbackRes);
 
 		return callbackRes.mRetPaths;
 	}

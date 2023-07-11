@@ -18,7 +18,7 @@
 namespace TotkToolkit::IO::Streams::Physfs {
 	class Physfs : public Formats::IO::BinaryIOStream {
 	public:
-		std::shared_ptr<Formats::IO::BinaryIOStream> Factory(PHYSFS_File* file, Formats::IO::Endianness endianness);
+		static std::shared_ptr<Formats::IO::BinaryIOStream> Factory(PHYSFS_File* file, Formats::IO::Endianness endianness);
 		Physfs(PHYSFS_File* file);
 
 		virtual void Seek(std::streampos pos) override;
@@ -71,7 +71,7 @@ namespace TotkToolkit::IO::Streams::Physfs {
 
 		virtual void ReadBytes(void* out, F_U32 size) override;
 
-		virtual void WriteBytes(void* in, F_U32 size) override;
+		virtual void WriteBytes(const void* in, F_U32 size) override;
 
 	protected:
 		virtual void ReadBytesWithEndian(void* out, PHYSFS_uint64 length) = 0;

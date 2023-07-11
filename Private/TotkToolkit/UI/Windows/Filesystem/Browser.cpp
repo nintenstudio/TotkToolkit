@@ -9,9 +9,12 @@
 #include <TotkToolkit/UI/Icons.h>
 #include <TotkToolkit/UI/Fonts.h>
 #include <TotkToolkit/Messaging/NoticeBoard.h>
+#include <TotkToolkit/Messaging/Notices/Configuration/Settings/Change/DumpDir.h>
 #include <TotkToolkit/Messaging/Notices/IO/Filesystem/FilesChange.h>
 #include <Formats/Aliases/Primitives.h>
+#include <Fallback/shared_ptr_atomic.h>
 #include <imgui.h>
+#include <future>
 
 namespace TotkToolkit::UI::Windows::Filesystem {
     Browser::Browser(bool* open) : TotkToolkit::UI::Window(TotkToolkit::UI::Localization::TranslationSource::GetText("BROWSER"), open) {
@@ -20,7 +23,9 @@ namespace TotkToolkit::UI::Windows::Filesystem {
     }
 
     void Browser::DrawContents() {
-        //std::string currentPath = "";
+        if (sMountArchivesTask.load() != nullptr) {
+            ImGui::ProgressBar(sMountArchivesTask.load()->GetTaskReport()->GetProgress());
+        }
         for (F_U32 i = 0; i < mSegmentedCurrentPath.size(); i++) {
             ImGui::AlignTextToFramePadding();
             ImVec2 folderNameStartPos = ImGui::GetCursorPos();
@@ -128,9 +133,16 @@ namespace TotkToolkit::UI::Windows::Filesystem {
 
         return res;
     }
-
+    
     void Browser::HandleNotice(std::shared_ptr<TotkToolkit::Messaging::Notice> notice) {
         switch (notice->mType) {
+            case TotkToolkit::Messaging::NoticeType::CONFIGURATION_SETTINGS_CHANGE_DUMPDIR: {
+                std::shared_ptr<TotkToolkit::Messaging::Notices::Configuration::Settings::Change::DumpDir> castNotice = std::static_pointer_cast<TotkToolkit::Messaging::Notices::Configuration::Settings::Change::DumpDir>(notice);
+
+                sMountArchivesTask = std::make_shared<TotkToolkit::Threading::Tasks::IO::Filesystem::MountArchives>([this]() -> void {sMountArchivesTask = nullptr;});
+                std::future<void> future = std::async(std::launch::async, []() -> void {sMountArchivesTask.load()->Execute();});
+                return;
+            }
             case TotkToolkit::Messaging::NoticeType::IO_FILESYSTEM_FILESCHANGE: {
                 std::shared_ptr<TotkToolkit::Messaging::Notices::IO::Filesystem::FilesChange> castNotice = std::static_pointer_cast<TotkToolkit::Messaging::Notices::IO::Filesystem::FilesChange>(notice);
 
@@ -154,4 +166,6 @@ namespace TotkToolkit::UI::Windows::Filesystem {
     void Browser::UpdateDirectories() {
         mCurrentDirectories = TotkToolkit::IO::Filesystem::EnumerateDirectories(GetCurrentPath());
     }
+
+    std::atomic<std::shared_ptr<TotkToolkit::Threading::Tasks::IO::Filesystem::MountArchives>> Browser::sMountArchivesTask = nullptr;
 }

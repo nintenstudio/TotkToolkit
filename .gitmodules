@@ -22,3 +22,6 @@
 [submodule "Lib/ImGuiColorTextEdit"]
 	path = Lib/ImGuiColorTextEdit
 	url = https://github.com/nintenstudio/ImGuiColorTextEdit.git
+[submodule "Lib/Fallback"]
+	path = Lib/Fallback
+	url = https://github.com/nintenstudio/Fallback.git

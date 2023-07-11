@@ -1,6 +1,18 @@
 #include <TotkToolkit/IO/Streams/Physfs/Physfs.h>
 
+#include <TotkToolkit/IO/Streams/Physfs/Little.h>
+#include <TotkToolkit/IO/Streams/Physfs/Big.h>
+#include <cassert>
+
 namespace TotkToolkit::IO::Streams::Physfs {
+	std::shared_ptr<Formats::IO::BinaryIOStream> Physfs::Factory(PHYSFS_File* file, Formats::IO::Endianness endianness) {
+		assert(endianness == Formats::IO::Endianness::LITTLE || endianness == Formats::IO::Endianness::BIG);
+
+		if (endianness == Formats::IO::Endianness::LITTLE)
+			return std::make_shared<TotkToolkit::IO::Streams::Physfs::Little>(file);
+		else
+			return std::make_shared<TotkToolkit::IO::Streams::Physfs::Big>(file);
+	}
 	Physfs::Physfs(PHYSFS_File* file) : mFile(file) {
 
 	}
@@ -47,7 +59,7 @@ namespace TotkToolkit::IO::Streams::Physfs {
 	void Physfs::ReadBytes(void* out, F_U32 size) {
 		PHYSFS_readBytes(mFile, out, size);
 	}
-	void Physfs::WriteBytes(void* in, F_U32 size) {
+	void Physfs::WriteBytes(const void* in, F_U32 size) {
 		PHYSFS_writeBytes(mFile, in, size);
 	}
 }

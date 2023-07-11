@@ -1,7 +1,6 @@
 #pragma once
 
 #include <TotkToolkit/Messaging/ExternalReceivers/IO/Filesystem.h>
-#include <physfs.h>
 #include <Formats/IO/BinaryIOStreamBasic.h>
 #include <memory>
 #include <vector>
@@ -18,10 +17,12 @@ namespace TotkToolkit::IO {
 
 		static std::shared_ptr<Formats::IO::BinaryIOStreamBasic> GetReadStream(std::string filepath);
 		static std::shared_ptr<Formats::IO::BinaryIOStreamBasic> GetWriteStream(std::string filepath);
+		static std::string GetRealDir(std::string filePath);
 
 		static std::vector<std::string> EnumerateFiles(std::string path);
 		static std::vector<std::string> EnumerateDirectories(std::string path);
-		static std::vector<std::string> SearchFilenames(std::string dir, std::string regex);
+		static std::vector<std::string> SearchFilenamesByRegex(std::string dir, std::string regex);
+		static std::vector<std::string> SearchFilenamesByExtension(std::string dir, std::string extension);
 
 	protected:
 		static TotkToolkit::Messaging::ExternalReceivers::IO::Filesystem sExternalReceiver;
