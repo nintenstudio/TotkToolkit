@@ -2,12 +2,15 @@
 
 #include <Formats/IO/BinaryIOStreamBasic.h>
 
-#include <physfs.h>
+#include <fstream>
+#include <string>
+#include <memory>
 
-namespace TotkToolkit::IO::Streams::Physfs {
-	class PhysfsBasic : public Formats::IO::BinaryIOStreamBasic {
+namespace TotkToolkit::IO::Streams::File {
+	class FileBasic : public Formats::IO::BinaryIOStreamBasic {
 	public:
-		PhysfsBasic(PHYSFS_File* file);
+		FileBasic(std::string filePath);
+		FileBasic(std::shared_ptr<std::fstream> file);
 
 		virtual std::shared_ptr<Formats::IO::BinaryIOStream> Factory(Formats::IO::Endianness endianness) override;
 
@@ -18,6 +21,6 @@ namespace TotkToolkit::IO::Streams::Physfs {
 		virtual F_UT GetBufferLength() override;
 
 	protected:
-		PHYSFS_File* mFile;
+		std::shared_ptr<std::fstream> mFile;
 	};
 }

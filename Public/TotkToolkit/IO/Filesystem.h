@@ -5,13 +5,14 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <atomic>
 
 namespace TotkToolkit::IO {
 	class Filesystem {
 	public:
 		static void Init();
 
-		static void Mount(std::string path);
+		static void Mount(std::string path, std::string mountPoint);
 		static void Unmount(std::string path);
 		static void SetWriteDir(std::string dir);
 
@@ -21,8 +22,8 @@ namespace TotkToolkit::IO {
 
 		static std::vector<std::string> EnumerateFiles(std::string path);
 		static std::vector<std::string> EnumerateDirectories(std::string path);
-		static std::vector<std::string> SearchFilenamesByRegex(std::string dir, std::string regex);
-		static std::vector<std::string> SearchFilenamesByExtension(std::string dir, std::string extension);
+		static std::vector<std::string> SearchFilenamesByRegex(std::string dir, std::string regex, std::shared_ptr<std::atomic<bool>> continueCondition = std::make_shared<std::atomic<bool>>(true));
+		static std::vector<std::string> SearchFilenamesByExtension(std::string dir, std::string extension, std::shared_ptr<std::atomic<bool>> continueCondition = std::make_shared<std::atomic<bool>>(true));
 
 	protected:
 		static TotkToolkit::Messaging::ExternalReceivers::IO::Filesystem sExternalReceiver;

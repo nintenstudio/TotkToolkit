@@ -27,7 +27,7 @@ namespace TotkToolkit::IO::Streams::Physfs {
 		PHYSFS_writeBytes(mFile, in, length);
 	}
 
-	std::shared_ptr<F_U8> PhysfsBasic::GetBuffer() {
+	std::shared_ptr<F_U8[]> PhysfsBasic::GetBuffer() {
 		PHYSFS_sint64 length = PHYSFS_fileLength(mFile);
 		assert(length != -1); // Not sure what we should do in this case..
 
@@ -35,7 +35,7 @@ namespace TotkToolkit::IO::Streams::Physfs {
 		PHYSFS_seek(mFile, 0);
 		PHYSFS_readBytes(mFile, buffer, length);
 
-		return std::shared_ptr<F_U8>(buffer);
+		return std::shared_ptr<F_U8[]>(buffer);
 	}
 	F_UT PhysfsBasic::GetBufferLength() {
 		return PHYSFS_fileLength(mFile);

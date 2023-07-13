@@ -133,14 +133,19 @@ namespace TotkToolkit::UI::Windows::Filesystem {
 
         return res;
     }
-    
+
+    std::future<void> future;
+    std::shared_ptr<std::atomic<bool>> futureContinueCondition;
     void Browser::HandleNotice(std::shared_ptr<TotkToolkit::Messaging::Notice> notice) {
         switch (notice->mType) {
             case TotkToolkit::Messaging::NoticeType::CONFIGURATION_SETTINGS_CHANGE_DUMPDIR: {
                 std::shared_ptr<TotkToolkit::Messaging::Notices::Configuration::Settings::Change::DumpDir> castNotice = std::static_pointer_cast<TotkToolkit::Messaging::Notices::Configuration::Settings::Change::DumpDir>(notice);
 
-                sMountArchivesTask = std::make_shared<TotkToolkit::Threading::Tasks::IO::Filesystem::MountArchives>([this]() -> void {sMountArchivesTask = nullptr;});
-                std::future<void> future = std::async(std::launch::async, []() -> void {sMountArchivesTask.load()->Execute();});
+                if (futureContinueCondition)
+                    *futureContinueCondition = false;
+                futureContinueCondition = std::make_shared<std::atomic<bool>>(true);
+                sMountArchivesTask = std::make_shared<TotkToolkit::Threading::Tasks::IO::Filesystem::MountArchives>([this]() -> void {/*sMountArchivesTask.store(nullptr);*/ }, futureContinueCondition);
+                future = std::async(std::launch::async, []() -> void {sMountArchivesTask.load()->Execute();});
                 return;
             }
             case TotkToolkit::Messaging::NoticeType::IO_FILESYSTEM_FILESCHANGE: {
