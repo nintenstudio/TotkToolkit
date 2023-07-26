@@ -144,6 +144,9 @@ namespace TotkToolkit::UI::Windows::Filesystem {
                 if (futureContinueCondition)
                     *futureContinueCondition = false;
                 futureContinueCondition = std::make_shared<std::atomic<bool>>(true);
+
+                TotkToolkit::IO::Filesystem::InitThread();
+                TotkToolkit::IO::Filesystem::SyncThread();
                 sMountArchivesTask = std::make_shared<TotkToolkit::Threading::Tasks::IO::Filesystem::MountArchives>([this]() -> void {/*sMountArchivesTask.store(nullptr);*/ }, futureContinueCondition);
                 future = std::async(std::launch::async, []() -> void {sMountArchivesTask.load()->Execute();});
                 return;
@@ -151,6 +154,8 @@ namespace TotkToolkit::UI::Windows::Filesystem {
             case TotkToolkit::Messaging::NoticeType::IO_FILESYSTEM_FILESCHANGE: {
                 std::shared_ptr<TotkToolkit::Messaging::Notices::IO::Filesystem::FilesChange> castNotice = std::static_pointer_cast<TotkToolkit::Messaging::Notices::IO::Filesystem::FilesChange>(notice);
 
+                TotkToolkit::IO::Filesystem::InitThread();
+                TotkToolkit::IO::Filesystem::SyncThread();
                 UpdateItems();
                 return;
             }
@@ -165,10 +170,14 @@ namespace TotkToolkit::UI::Windows::Filesystem {
     }
 
     void Browser::UpdateFiles () {
+        TotkToolkit::IO::Filesystem::InitThread();
+        TotkToolkit::IO::Filesystem::SyncThread();
         mCurrentFiles = TotkToolkit::IO::Filesystem::EnumerateFiles(GetCurrentPath());
     }
 
     void Browser::UpdateDirectories() {
+        TotkToolkit::IO::Filesystem::InitThread();
+        TotkToolkit::IO::Filesystem::SyncThread();
         mCurrentDirectories = TotkToolkit::IO::Filesystem::EnumerateDirectories(GetCurrentPath());
     }
 

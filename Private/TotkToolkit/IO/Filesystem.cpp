@@ -4,13 +4,72 @@
 #include <TotkToolkit/Messaging/Notices/IO/Filesystem/FilesChange.h>
 #include <TotkToolkit/IO/Streams/Physfs/PhysfsBasic.h>
 #include <TotkToolkit/IO/Streams/File/FileBasic.h>
+#include <TotkToolkit/IO/PHYSFSCalls/Mount.h>
+#include <TotkToolkit/IO/PHYSFSCalls/MountMemory.h>
+#include <TotkToolkit/IO/PHYSFSCalls/Unmount.h>
+#include <TotkToolkit/IO/PHYSFSCall.h>
 #include <Formats/Resources/ZSTD/ZSTDBackend.h>
 #include <archiver_sarc.h>
 #include <physfs.h>
 #include <filesystem>
+#include <map>
 #include <vector>
 #include <regex>
 #include <iostream>
+#include <shared_mutex>
+#include <thread>
+
+std::map<std::thread::id, std::vector<std::shared_ptr<TotkToolkit::IO::PHYSFSCall>>> sPHYSFSCallQueue;
+std::shared_mutex sPHYSFSCallQueueMutex;
+std::vector<std::shared_ptr<TotkToolkit::IO::PHYSFSCall>> sEntirePHYSFSCallQueue; // Used to get new threads up-to-date
+std::shared_mutex sEntirePHYSFSCallQueueMutex;
+void AddPHYSFSCall(std::shared_ptr<TotkToolkit::IO::PHYSFSCall> call) {
+	{
+		std::unique_lock<std::shared_mutex> lock(sPHYSFSCallQueueMutex);
+		for (auto& it : sPHYSFSCallQueue) {
+			it.second.push_back(call);
+		}
+	}
+	{
+		std::unique_lock<std::shared_mutex> lock(sEntirePHYSFSCallQueueMutex);
+		sEntirePHYSFSCallQueue.push_back(call);
+	}
+}
+void ExecutePHYSFSCallQueue() {
+	std::shared_lock<std::shared_mutex> lock(sPHYSFSCallQueueMutex);
+	for (std::shared_ptr<TotkToolkit::IO::PHYSFSCall> call : sPHYSFSCallQueue.at(std::this_thread::get_id())) {
+		call->Execute();
+	}
+
+	sPHYSFSCallQueue.at(std::this_thread::get_id()).clear();
+}
+
+void BindCurrentThreadContext() {
+	static std::map<std::thread::id, PHYSFS_Context> lsThreadContexts;
+	static std::shared_mutex lsThreadContextsMutex;
+	
+	{
+		std::shared_lock<std::shared_mutex> lock(lsThreadContextsMutex);
+		if (lsThreadContexts.contains(std::this_thread::get_id())) {
+			PHYSFS_bindContext(lsThreadContexts.at(std::this_thread::get_id()));
+			return;
+		}
+	}
+
+		PHYSFS_Context context = PHYSFS_allocContext();
+		PHYSFS_initContext(context, "");
+		PHYSFS_bindContext(context);
+		PHYSFS_registerArchiver(&archiver_sarc_default);
+	{
+		std::unique_lock<std::shared_mutex> lock(lsThreadContextsMutex);
+		lsThreadContexts.insert({std::this_thread::get_id(), context});
+	}
+	{
+		std::unique_lock<std::shared_mutex> queueLock(sPHYSFSCallQueueMutex);
+		std::shared_lock<std::shared_mutex> entireQueueLock(sEntirePHYSFSCallQueueMutex);
+		sPHYSFSCallQueue.insert({std::this_thread::get_id(), sEntirePHYSFSCallQueue});
+	}
+}
 
 struct SearchFilenamesByRegexCallbackData {
 	SearchFilenamesByRegexCallbackData(std::string regex, std::shared_ptr<std::atomic<bool>> continueCondition) : mRegex(regex), mContinueCondition(continueCondition), mRetPaths() {
@@ -31,9 +90,6 @@ PHYSFS_EnumerateCallbackResult searchFilenamesByRegexCallback(void *data, const 
 	std::string filePath = (std::filesystem::path(origdir) / std::filesystem::path(fname)).generic_string().c_str();
 
 	std::regex regex(callbackData->mRegex.c_str(), std::regex_constants::ECMAScript | std::regex_constants::icase);
-
-	if (std::string(fname).ends_with(".pack.zs"))
-		callbackData->mRetPaths.push_back(filePath);
 
 	if (std::regex_search(fname, regex)) {
 		callbackData->mRetPaths.push_back(filePath);
@@ -80,26 +136,31 @@ PHYSFS_EnumerateCallbackResult searchFilenamesByExtensionCallback(void *data, co
 namespace TotkToolkit::IO {
 	void Filesystem::Init() {
 		PHYSFS_init("");
-		PHYSFS_registerArchiver(&archiver_sarc_default);
 		Formats::Resources::ZSTD::ZSTDBackend::Init();
 		TotkToolkit::Messaging::NoticeBoard::AddReceiver(&sExternalReceiver);
 	}
 
+	void Filesystem::InitThread() {
+		BindCurrentThreadContext();
+	}
+
+	void Filesystem::SyncThread() {
+		ExecutePHYSFSCallQueue();
+	}
+
 	void Filesystem::Mount(std::string path, std::string mountPoint) {
-		if (path.ends_with(".zs")) {
-			std::shared_ptr<Formats::IO::BinaryIOStreamBasic> readStream = std::make_shared<TotkToolkit::IO::Streams::File::FileBasic>(path);
-			std::shared_ptr<Formats::IO::BinaryIOStreamBasic> decompressed = Formats::Resources::ZSTD::ZSTDBackend::Decompress(readStream);
-			std::shared_ptr<F_U8[]> decompressedBuffer = decompressed->GetBuffer();
-			F_UT decompressedBufferLength = decompressed->GetBufferLength();
-			if (PHYSFS_mountMemory(decompressedBuffer.get(), decompressedBufferLength, nullptr, path.c_str(), mountPoint.c_str(), true))
-				TotkToolkit::Messaging::NoticeBoard::AddNotice(std::make_shared<TotkToolkit::Messaging::Notices::IO::Filesystem::FilesChange>());
-		}
-		else if (PHYSFS_mount(path.c_str(), mountPoint.c_str(), true))
-			TotkToolkit::Messaging::NoticeBoard::AddNotice(std::make_shared<TotkToolkit::Messaging::Notices::IO::Filesystem::FilesChange>());
+		AddPHYSFSCall(std::make_shared<TotkToolkit::IO::PHYSFSCalls::Mount>(path, mountPoint, true));
+		ExecutePHYSFSCallQueue();
+	}
+	void Filesystem::MountStream(std::shared_ptr<Formats::IO::BinaryIOStreamBasic> stream, std::string filename, std::string mountPoint) {
+		std::shared_ptr<F_U8[]> buffer = stream->GetBuffer();
+		F_UT bufferLength = stream->GetBufferLength();
+		AddPHYSFSCall(std::make_shared<TotkToolkit::IO::PHYSFSCalls::MountMemory>(buffer, bufferLength, nullptr, filename, mountPoint, true));
+		ExecutePHYSFSCallQueue();
 	}
 	void Filesystem::Unmount(std::string path) {
-		if (PHYSFS_unmount(path.c_str()))
-			TotkToolkit::Messaging::NoticeBoard::AddNotice(std::make_shared<TotkToolkit::Messaging::Notices::IO::Filesystem::FilesChange>());
+		AddPHYSFSCall(std::make_shared<TotkToolkit::IO::PHYSFSCalls::Unmount>(path));
+		ExecutePHYSFSCallQueue();
 	}
 	void Filesystem::SetWriteDir(std::string dir) {
 		PHYSFS_setWriteDir(dir.c_str());
@@ -107,14 +168,27 @@ namespace TotkToolkit::IO {
 
 	std::shared_ptr<Formats::IO::BinaryIOStreamBasic> Filesystem::GetReadStream(std::string filepath) {
 		PHYSFS_File* file = PHYSFS_openRead(filepath.c_str());
-		return std::make_shared<TotkToolkit::IO::Streams::Physfs::PhysfsBasic>(file);
+		if (file == nullptr)
+			return nullptr;
+		std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream = std::make_shared<TotkToolkit::IO::Streams::Physfs::PhysfsBasic>(file);
+
+		if (stream != nullptr && filepath.ends_with(".zs")) {
+			// TOTKTOOLKIT_TODO_FUNCTIONAL: Check for zstandard compression signature.
+			std::shared_ptr<Formats::IO::BinaryIOStreamBasic> decompressed = Formats::Resources::ZSTD::ZSTDBackend::Decompress(stream);
+			if (decompressed != nullptr)
+				return decompressed;
+			return nullptr; // Not sure what to do here.. filename ends in zs but either can't be decompressed or isn't compressed.
+		}
+		else {
+			return stream;
+		}
 	}
 	std::shared_ptr<Formats::IO::BinaryIOStreamBasic> Filesystem::GetWriteStream(std::string filepath) {
 		PHYSFS_File* file = PHYSFS_openWrite(filepath.c_str());
 		return std::make_shared<TotkToolkit::IO::Streams::Physfs::PhysfsBasic>(file);
 	}
-	std::string Filesystem::GetRealDir(std::string filePath) {
-		return PHYSFS_getRealDir(filePath.c_str());
+	std::string Filesystem::GetRealDir(std::string path) {
+		return PHYSFS_getRealDir(path.c_str());
 	}
 
 	std::vector<std::string> Filesystem::EnumerateFiles(std::string path) {
@@ -152,7 +226,7 @@ namespace TotkToolkit::IO {
 	}
 	std::vector<std::string> Filesystem::SearchFilenamesByExtension(std::string dir, std::string extension, std::shared_ptr<std::atomic<bool>> continueCondition) {
 		SearchFilenamesByExtensionCallbackData callbackRes(extension, continueCondition);
-
+		
 		PHYSFS_enumerate(dir.c_str(), searchFilenamesByExtensionCallback, &callbackRes);
 
 		return callbackRes.mRetPaths;

@@ -12,13 +12,18 @@ namespace TotkToolkit::IO {
 	public:
 		static void Init();
 
+		/// @brief Should be called at least once on new threads that use filesystem.
+		static void InitThread();
+		static void SyncThread();
+
 		static void Mount(std::string path, std::string mountPoint);
+		static void MountStream(std::shared_ptr<Formats::IO::BinaryIOStreamBasic> stream, std::string filename, std::string mountPoint);
 		static void Unmount(std::string path);
 		static void SetWriteDir(std::string dir);
 
 		static std::shared_ptr<Formats::IO::BinaryIOStreamBasic> GetReadStream(std::string filepath);
 		static std::shared_ptr<Formats::IO::BinaryIOStreamBasic> GetWriteStream(std::string filepath);
-		static std::string GetRealDir(std::string filePath);
+		static std::string GetRealDir(std::string path);
 
 		static std::vector<std::string> EnumerateFiles(std::string path);
 		static std::vector<std::string> EnumerateDirectories(std::string path);
