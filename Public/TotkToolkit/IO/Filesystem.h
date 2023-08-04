@@ -16,9 +16,9 @@ namespace TotkToolkit::IO {
 		static void InitThread();
 		static void SyncThread();
 
-		static void Mount(std::string path, std::string mountPoint);
-		static void MountStream(std::shared_ptr<Formats::IO::BinaryIOStreamBasic> stream, std::string filename, std::string mountPoint);
-		static void Unmount(std::string path);
+		static void Mount(std::string path, std::string mountPoint, bool notifyFileChange = true);
+		static void MountStream(std::shared_ptr<Formats::IO::BinaryIOStreamBasic> stream, std::string filename, std::string mountPoint, bool notifyFileChange = true);
+		static void Unmount(std::string path, bool notifyFileChange = true);
 		static void SetWriteDir(std::string dir);
 
 		static std::shared_ptr<Formats::IO::BinaryIOStreamBasic> GetReadStream(std::string filepath);

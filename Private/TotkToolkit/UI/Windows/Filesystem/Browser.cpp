@@ -5,6 +5,7 @@
 #include <TotkToolkit/UI/MainWindow.h>
 #include <TotkToolkit/UI/EditorSystem.h>
 #include <TotkToolkit/UI/Windows/Editors/BYML.h>
+#include <TotkToolkit/UI/Windows/Editors/TXTG.h>
 #include <TotkToolkit/UI/Localization/TranslationSource.h>
 #include <TotkToolkit/UI/Icons.h>
 #include <TotkToolkit/UI/Fonts.h>
@@ -19,10 +20,16 @@
 namespace TotkToolkit::UI::Windows::Filesystem {
     Browser::Browser(bool* open) : TotkToolkit::UI::Window(TotkToolkit::UI::Localization::TranslationSource::GetText("BROWSER"), open) {
         TotkToolkit::Messaging::NoticeBoard::AddReceiver(this);
+
+        std::unique_lock<std::shared_mutex> lock(mSegmentedCurrentPathMutex);
         mSegmentedCurrentPath.push_back("romfs");
     }
 
     void Browser::DrawContents() {
+        std::unique_lock<TotkToolkit::Threading::Mutexes::SharedRecursive> lock1(mSegmentedCurrentPathMutex);
+        std::shared_lock<TotkToolkit::Threading::Mutexes::SharedRecursive> lock2(mCurrentFilesMutex);
+        std::shared_lock<TotkToolkit::Threading::Mutexes::SharedRecursive> lock3(mCurrentDirectoriesMutex);
+
         if (sMountArchivesTask.load() != nullptr) {
             ImGui::ProgressBar(sMountArchivesTask.load()->GetTaskReport()->GetProgress());
         }
@@ -84,7 +91,7 @@ namespace TotkToolkit::UI::Windows::Filesystem {
                     if (ImGui::InvisibleButton(("File " + mCurrentFiles[i]).c_str(), ImVec2(itemWidth, itemWidth))) {
                         // TOTKTOOLKIT_TODO_FUNCTIONAL: Open with default editor for file extension
                     }
-                    if (ImGui::BeginPopupContextWindow()) {
+                    if (ImGui::BeginPopupContextItem()) {
                         ImGui::PushID("File Context Menu");
                         if (ImGui::BeginMenu("Open With")) {
                             ImGui::PushID("Open With");
@@ -92,6 +99,13 @@ namespace TotkToolkit::UI::Windows::Filesystem {
                             if (ImGui::MenuItem("BYML Text")) {
                                 std::string currentFilePath = GetCurrentPath() + mCurrentFiles[i];
                                 std::shared_ptr<TotkToolkit::UI::Windows::Editors::BYML> editor = std::make_shared<TotkToolkit::UI::Windows::Editors::BYML>(TotkToolkit::IO::FileHandle(currentFilePath), mCurrentFiles[i], nullptr);
+                                std::shared_ptr<Formats::IO::BinaryIOStreamBasic> fileStream = TotkToolkit::IO::Filesystem::GetReadStream(currentFilePath);
+                                editor->Parse();
+                                TotkToolkit::UI::EditorSystem::AddEditor(editor);
+                            }
+                            else if (ImGui::MenuItem("TXTG Texture")) {
+                                std::string currentFilePath = GetCurrentPath() + mCurrentFiles[i];
+                                std::shared_ptr<TotkToolkit::UI::Windows::Editors::TXTG> editor = std::make_shared<TotkToolkit::UI::Windows::Editors::TXTG>(TotkToolkit::IO::FileHandle(currentFilePath), mCurrentFiles[i], nullptr);
                                 std::shared_ptr<Formats::IO::BinaryIOStreamBasic> fileStream = TotkToolkit::IO::Filesystem::GetReadStream(currentFilePath);
                                 editor->Parse();
                                 TotkToolkit::UI::EditorSystem::AddEditor(editor);
@@ -126,6 +140,7 @@ namespace TotkToolkit::UI::Windows::Filesystem {
     }
 
     std::string Browser::GetCurrentPath() {
+        std::shared_lock<TotkToolkit::Threading::Mutexes::SharedRecursive> lock(mSegmentedCurrentPathMutex);
         std::string res = "";
 
         for (std::string segment : mSegmentedCurrentPath)
@@ -172,13 +187,21 @@ namespace TotkToolkit::UI::Windows::Filesystem {
     void Browser::UpdateFiles () {
         TotkToolkit::IO::Filesystem::InitThread();
         TotkToolkit::IO::Filesystem::SyncThread();
-        mCurrentFiles = TotkToolkit::IO::Filesystem::EnumerateFiles(GetCurrentPath());
+
+        std::vector<std::string> currentFiles = TotkToolkit::IO::Filesystem::EnumerateFiles(GetCurrentPath());
+
+        std::unique_lock<TotkToolkit::Threading::Mutexes::SharedRecursive> lock(mCurrentFilesMutex);
+        mCurrentFiles = currentFiles;
     }
 
     void Browser::UpdateDirectories() {
         TotkToolkit::IO::Filesystem::InitThread();
         TotkToolkit::IO::Filesystem::SyncThread();
-        mCurrentDirectories = TotkToolkit::IO::Filesystem::EnumerateDirectories(GetCurrentPath());
+
+        std::vector<std::string> currentDirectories = TotkToolkit::IO::Filesystem::EnumerateDirectories(GetCurrentPath());
+
+        std::unique_lock<TotkToolkit::Threading::Mutexes::SharedRecursive> lock(mCurrentDirectoriesMutex);
+        mCurrentDirectories = currentDirectories;
     }
 
     std::atomic<std::shared_ptr<TotkToolkit::Threading::Tasks::IO::Filesystem::MountArchives>> Browser::sMountArchivesTask = nullptr;

@@ -7,7 +7,7 @@
 namespace TotkToolkit::IO::PHYSFSCalls {
     class Mount : public TotkToolkit::IO::PHYSFSCall {
     public:
-        Mount(std::string path, std::string mountPoint, bool appendToPath) : mPath(path), mMountPoint(mountPoint), mAppendToPath(appendToPath) {
+        Mount(std::string path, std::string mountPoint, bool appendToPath, bool notifyFileChange = true) : mPath(path), mMountPoint(mountPoint), mAppendToPath(appendToPath), mNotifyFileChange(notifyFileChange) {
 
         }
 
@@ -17,5 +17,6 @@ namespace TotkToolkit::IO::PHYSFSCalls {
         std::string mPath;
         std::string mMountPoint;
         bool mAppendToPath;
+        bool mNotifyFileChange;
     };
 }

@@ -7,6 +7,7 @@
 #include <TotkToolkit/IO/PHYSFSCalls/Mount.h>
 #include <TotkToolkit/IO/PHYSFSCalls/MountMemory.h>
 #include <TotkToolkit/IO/PHYSFSCalls/Unmount.h>
+#include <TotkToolkit/IO/PHYSFSCalls/SetWriteDir.h>
 #include <TotkToolkit/IO/PHYSFSCall.h>
 #include <Formats/Resources/ZSTD/ZSTDBackend.h>
 #include <archiver_sarc.h>
@@ -59,6 +60,7 @@ void BindCurrentThreadContext() {
 		PHYSFS_Context context = PHYSFS_allocContext();
 		PHYSFS_initContext(context, "");
 		PHYSFS_bindContext(context);
+		PHYSFS_permitSymbolicLinks(true); // We trust our user. Plus, it helps with performance by eliminating checks in PHYSFS
 		PHYSFS_registerArchiver(&archiver_sarc_default);
 	{
 		std::unique_lock<std::shared_mutex> lock(lsThreadContextsMutex);
@@ -95,7 +97,9 @@ PHYSFS_EnumerateCallbackResult searchFilenamesByRegexCallback(void *data, const 
 		callbackData->mRetPaths.push_back(filePath);
 	}
 
-	if (PHYSFS_isDirectory(filePath.c_str())) {
+	if (filePath.find_first_of('.') == std::string::npos) {
+	// PHYSFS_isDirectory is incredibly slow...
+	//if (PHYSFS_isDirectory(filePath.c_str())) {
 		PHYSFS_enumerate(filePath.c_str(), searchFilenamesByRegexCallback, callbackData);
 	}
 
@@ -123,7 +127,9 @@ PHYSFS_EnumerateCallbackResult searchFilenamesByExtensionCallback(void *data, co
 	if (std::string(fname).ends_with(callbackData->mExtension))
 		callbackData->mRetPaths.push_back(filePath);
 
-	if (PHYSFS_isDirectory(filePath.c_str())) {
+	if (filePath.find_first_of('.') == std::string::npos) {
+	// PHYSFS_isDirectory is incredibly slow...
+	//if (PHYSFS_isDirectory(filePath.c_str())) {
 		PHYSFS_enumerate(filePath.c_str(), searchFilenamesByExtensionCallback, callbackData);
 
 		if (!*callbackData->mContinueCondition)
@@ -148,22 +154,23 @@ namespace TotkToolkit::IO {
 		ExecutePHYSFSCallQueue();
 	}
 
-	void Filesystem::Mount(std::string path, std::string mountPoint) {
-		AddPHYSFSCall(std::make_shared<TotkToolkit::IO::PHYSFSCalls::Mount>(path, mountPoint, true));
+	void Filesystem::Mount(std::string path, std::string mountPoint, bool notifyFileChange) {
+		AddPHYSFSCall(std::make_shared<TotkToolkit::IO::PHYSFSCalls::Mount>(path, mountPoint, true, notifyFileChange));
 		ExecutePHYSFSCallQueue();
 	}
-	void Filesystem::MountStream(std::shared_ptr<Formats::IO::BinaryIOStreamBasic> stream, std::string filename, std::string mountPoint) {
+	void Filesystem::MountStream(std::shared_ptr<Formats::IO::BinaryIOStreamBasic> stream, std::string filename, std::string mountPoint, bool notifyFileChange) {
 		std::shared_ptr<F_U8[]> buffer = stream->GetBuffer();
 		F_UT bufferLength = stream->GetBufferLength();
-		AddPHYSFSCall(std::make_shared<TotkToolkit::IO::PHYSFSCalls::MountMemory>(buffer, bufferLength, nullptr, filename, mountPoint, true));
+		AddPHYSFSCall(std::make_shared<TotkToolkit::IO::PHYSFSCalls::MountMemory>(buffer, bufferLength, nullptr, filename, mountPoint, true, notifyFileChange));
 		ExecutePHYSFSCallQueue();
 	}
-	void Filesystem::Unmount(std::string path) {
-		AddPHYSFSCall(std::make_shared<TotkToolkit::IO::PHYSFSCalls::Unmount>(path));
+	void Filesystem::Unmount(std::string path, bool notifyFileChange) {
+		AddPHYSFSCall(std::make_shared<TotkToolkit::IO::PHYSFSCalls::Unmount>(path, notifyFileChange));
 		ExecutePHYSFSCallQueue();
 	}
 	void Filesystem::SetWriteDir(std::string dir) {
-		PHYSFS_setWriteDir(dir.c_str());
+		AddPHYSFSCall(std::make_shared<TotkToolkit::IO::PHYSFSCalls::SetWriteDir>(dir));
+		ExecutePHYSFSCallQueue();
 	}
 
 	std::shared_ptr<Formats::IO::BinaryIOStreamBasic> Filesystem::GetReadStream(std::string filepath) {
@@ -184,6 +191,7 @@ namespace TotkToolkit::IO {
 		}
 	}
 	std::shared_ptr<Formats::IO::BinaryIOStreamBasic> Filesystem::GetWriteStream(std::string filepath) {
+		PHYSFS_mkdir(std::filesystem::path(filepath).parent_path().generic_string().c_str());
 		PHYSFS_File* file = PHYSFS_openWrite(filepath.c_str());
 		return std::make_shared<TotkToolkit::IO::Streams::Physfs::PhysfsBasic>(file);
 	}
@@ -198,8 +206,11 @@ namespace TotkToolkit::IO {
 
 		char* currentFile;
 		for (F_U32 i = 0; currentFile = files[i], currentFile != nullptr; i++) {
-			if (!PHYSFS_isDirectory((std::filesystem::path(path) / std::filesystem::path(currentFile)).generic_string().c_str()))
+			if (std::string(currentFile).find_first_of('.') != std::string::npos)
 				res.push_back(currentFile);
+			// PHYSFS_isDirectory is incredibly slow...
+			//if (!PHYSFS_isDirectory((std::filesystem::path(path) / std::filesystem::path(currentFile)).generic_string().c_str()))
+			//	res.push_back(currentFile);
 		}
 
 		return res;
@@ -211,8 +222,11 @@ namespace TotkToolkit::IO {
 
 		char* currentFile;
 		for (F_U32 i = 0; currentFile = files[i], currentFile != nullptr; i++) {
-			if (PHYSFS_isDirectory((std::filesystem::path(path) / std::filesystem::path(currentFile)).generic_string().c_str()))
+			if (std::string(currentFile).find_first_of('.') == std::string::npos)
 				res.push_back(currentFile);
+			// PHYSFS_isDirectory is incredibly slow...
+			//if (PHYSFS_isDirectory((std::filesystem::path(path) / std::filesystem::path(currentFile)).generic_string().c_str()))
+			//	res.push_back(currentFile);
 		}
 
 		return res;

@@ -10,10 +10,14 @@ namespace TotkToolkit::IO {
 	}
 
 	std::shared_ptr<Formats::IO::BinaryIOStreamBasic> FileHandle::GetReadStream() {
+		TotkToolkit::IO::Filesystem::InitThread();
+		TotkToolkit::IO::Filesystem::SyncThread();
 		return TotkToolkit::IO::Filesystem::GetReadStream(mPath);
 	}
 
 	std::shared_ptr<Formats::IO::BinaryIOStreamBasic> FileHandle::GetWriteStream() {
+		TotkToolkit::IO::Filesystem::InitThread();
+		TotkToolkit::IO::Filesystem::SyncThread();
 		return TotkToolkit::IO::Filesystem::GetWriteStream(mPath);
 	}
 }

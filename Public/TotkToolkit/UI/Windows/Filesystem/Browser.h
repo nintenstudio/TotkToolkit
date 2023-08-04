@@ -4,6 +4,7 @@
 #include <TotkToolkit/Messaging/Receiver.h>
 
 #include <TotkToolkit/Threading/Tasks/IO/Filesystem/MountArchives.h>
+#include <TotkToolkit/Threading/Mutexes/SharedRecursive.h>
 #include <vector>
 #include <string>
 #include <memory>
@@ -25,9 +26,9 @@ protected:
         void UpdateFiles();
         void UpdateDirectories();
 
-        std::vector<std::string> mSegmentedCurrentPath;
-        std::vector<std::string> mCurrentFiles;
-        std::vector<std::string> mCurrentDirectories;
+        std::vector<std::string> mSegmentedCurrentPath; TotkToolkit::Threading::Mutexes::SharedRecursive mSegmentedCurrentPathMutex; // Should always be acquired first to avoid deadlock.
+        std::vector<std::string> mCurrentFiles; TotkToolkit::Threading::Mutexes::SharedRecursive mCurrentFilesMutex; // Should always be acquired second to avoid deadlock.
+        std::vector<std::string> mCurrentDirectories; TotkToolkit::Threading::Mutexes::SharedRecursive mCurrentDirectoriesMutex; // Should always be acquired third to avoid deadlock.
 
         static std::atomic<std::shared_ptr<TotkToolkit::Threading::Tasks::IO::Filesystem::MountArchives>> sMountArchivesTask; // TOTKTOOLKIT_FUNCTIONAL_CONSIDERATION_THREAD_SAFETY: Our callback modifies this, and that's run on the task thread.
     };

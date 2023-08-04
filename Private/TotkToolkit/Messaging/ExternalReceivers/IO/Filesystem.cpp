@@ -36,6 +36,8 @@ namespace TotkToolkit::Messaging::ExternalReceivers::IO {
 			case TotkToolkit::Messaging::NoticeType::CONFIGURATION_SETTINGS_CHANGE_WRITEDIR: {
 					std::shared_ptr<TotkToolkit::Messaging::Notices::Configuration::Settings::Change::WriteDir> castNotice = std::static_pointer_cast<TotkToolkit::Messaging::Notices::Configuration::Settings::Change::WriteDir>(notice);
 
+					TotkToolkit::IO::Filesystem::InitThread();
+					TotkToolkit::IO::Filesystem::SyncThread();
 					TotkToolkit::IO::Filesystem::SetWriteDir(castNotice->mNewWriteDir);
 					return;
 				}
