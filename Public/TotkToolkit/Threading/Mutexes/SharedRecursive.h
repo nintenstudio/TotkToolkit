@@ -4,6 +4,7 @@
 #include <shared_mutex>
 #include <vector>
 #include <algorithm>
+#include <atomic>
 #include <thread>
 
 namespace TotkToolkit::Threading::Mutexes {
