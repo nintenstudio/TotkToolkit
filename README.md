@@ -5,9 +5,12 @@ An editor for The Legend of Zelda: Tears of the Kingdom.
 TotkToolkit can be built from source for Windows, Linux, and Nintendo Switch. To build for Linux or Switch, a codespace can be created off of this repo and things will work right away. To build for Windows or Switch, or to build on one's own Linux installation, further setup is required.
 ### *For desktop*
 To build for windows or linux, simply use CMake to generate build files and then use your compiler of choice to compile them.
+#### Prerequisites
+* ``rust`` - run the command ``curl --proto '=https' --tlsv1.3 https://sh.rustup.rs -sSf | sh`` to install. 
 ### *For switch*
 #### Prerequisites
-* ``libnx`` - install from instructions at https://switchbrew.org/wiki/Setting_up_Development_Environment. You'll also need to make sure the ``DEVKITPRO`` environment variable is set up correctly, and that ``DEVKITPRO/tools/bin`` is in PATH. 
+* ``libnx`` - install from instructions at https://switchbrew.org/wiki/Setting_up_Development_Environment. You'll also need to make sure the ``DEVKITPRO`` environment variable is set up correctly, and that ``DEVKITPRO/tools/bin`` is in PATH.
+* ``rust`` - run the command ``curl --proto '=https' --tlsv1.3 https://sh.rustup.rs -sSf | sh`` to install. 
 
 Use CMake to build for switch. Make sure that it is using the toolchain file at ``Lib/Switch-CMake/DevkitA64Libnx.cmake``.
 
