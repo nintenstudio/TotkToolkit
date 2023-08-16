@@ -142,7 +142,6 @@ PHYSFS_EnumerateCallbackResult searchFilenamesByExtensionCallback(void *data, co
 namespace TotkToolkit::IO {
 	void Filesystem::Init() {
 		PHYSFS_init("");
-		Formats::Resources::ZSTD::ZSTDBackend::Init();
 		TotkToolkit::Messaging::NoticeBoard::AddReceiver(&sExternalReceiver);
 	}
 

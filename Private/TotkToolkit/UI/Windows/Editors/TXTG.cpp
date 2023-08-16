@@ -27,9 +27,14 @@ namespace TotkToolkit::UI::Windows::Editors {
 		#if defined(GL_UNPACK_ROW_LENGTH)
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 		#endif
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mTXTG->GetWidth(), mTXTG->GetHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, data.get());
+		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mTXTG->GetWidth(), mTXTG->GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, data.get());
+		glCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, mTXTG->GetWidth(), mTXTG->GetHeight(), 0, surface->GetDataSize(), data.get());
 
 		mTextureID = (ImTextureID)texId;
+
+		//if (GLAD_GL_EXT_texture_compression_s3tc) {
+		//	GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
+		//}
 
 		return true;
 	}
