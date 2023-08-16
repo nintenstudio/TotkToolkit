@@ -58,39 +58,93 @@ namespace TotkToolkit::UI::Windows::Filesystem {
 
         float itemWidth = 4 * ImGui::GetFontSize();
         int itemsPerCol = (ImGui::GetContentRegionAvail().x / itemWidth) - 1;
+        ImVec2 fileTableStart = ImGui::GetCursorPos();
+        ImVec2 fileTableSize = ImGui::GetContentRegionAvail();
         if (itemsPerCol > 0) {
             if (ImGui::BeginTable(AppendIdentifier("File Table").c_str(), itemsPerCol, ImGuiTableFlags_SizingFixedSame | ImGuiTableColumnFlags_NoHeaderWidth)) {
                 for (F_U32 i = 0; i < mCurrentDirectories.size(); i++) {
+                    // Go to the next column
                     ImGui::TableNextColumn();
+
+                    // Get the position we're at
                     ImVec2 itemPos = ImGui::GetCursorPos();
                     ImVec2 itemScreenPos = ImGui::GetCursorScreenPos();
+                    
+                    // Don't draw the item if it isn't in view
+                    if (itemPos.y + itemWidth < ImGui::GetScrollY()) {
+                        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + itemWidth);
+                        continue;
+                    }
+                    if (itemPos.y > fileTableStart.y + ImGui::GetScrollY() + fileTableSize.y) {
+                        // Just keep moving the cursor forward so it can still scroll
+                        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + itemWidth);
+                        continue;
+                    }
+
+                    // Make the actual button the user can click on
                     if (ImGui::InvisibleButton(("Directory " + mCurrentDirectories[i]).c_str(), ImVec2(itemWidth, itemWidth))) {
                         mSegmentedCurrentPath.push_back(mCurrentDirectories[i]);
                         UpdateItems();
                         break;
                     }
+
+                    // Add hover effect to the button
                     if (ImGui::IsItemHovered()) {
                         ImVec2 hoverRectMin = ImVec2(itemScreenPos.x, itemScreenPos.y);
                         ImVec2 hoverRectMax = ImVec2(itemScreenPos.x + itemWidth, itemScreenPos.y + itemWidth);
                         ImVec4 hoverColor = ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered];
                         ImGui::GetWindowDrawList()->AddRectFilled(hoverRectMin, hoverRectMax, IM_COL32(hoverColor.x * 255, hoverColor.y * 255, hoverColor.z * 255, hoverColor.w * 255), ImGui::GetStyle().FrameRounding);
                     }
+
+                    // Set the cursor back as if we never drew that invisible button
                     ImGui::SetCursorPos(itemPos);
+
+                    // Draw the icon
                     ImGui::PushFont(TotkToolkit::UI::Fonts::sNormalFont2x);
                     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + itemWidth / 2 - ImGui::GetFontSize() / 2);
                     ImGui::Text(TotkToolkit::UI::Icons::FOLDER_ICON);
                     ImGui::PopFont();
+
+                    // Draw the name
                     ImGui::TextWrapped((mCurrentDirectories[i]).c_str());
                 }
                 for (F_U32 i = 0; i < mCurrentFiles.size(); i++) {
                     ImGui::PushID(i);
 
+                    // Go the the next column
                     ImGui::TableNextColumn();
+
+                    // Get the position we're at
                     ImVec2 itemPos = ImGui::GetCursorPos();
                     ImVec2 itemScreenPos = ImGui::GetCursorScreenPos();
+
+                    // Don't draw the item if it isn't in view
+                    if (itemPos.y + itemWidth < ImGui::GetScrollY()) {
+                        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + itemWidth);
+                        ImGui::PopID();
+                        continue;
+                    }
+                    if (itemPos.y > fileTableStart.y + ImGui::GetScrollY() + fileTableSize.y) {
+                        // Just keep moving the cursor forward so it can still scroll
+                        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + itemWidth);
+                        ImGui::PopID();
+                        continue;
+                    }
+
+                    // Make the actual button the user can click on
                     if (ImGui::InvisibleButton(("File " + mCurrentFiles[i]).c_str(), ImVec2(itemWidth, itemWidth))) {
                         // TOTKTOOLKIT_TODO_FUNCTIONAL: Open with default editor for file extension
                     }
+
+                    // Add hover effect to the button
+                    if (ImGui::IsItemHovered()) {
+                        ImVec2 hoverRectMin = ImVec2(itemScreenPos.x, itemScreenPos.y);
+                        ImVec2 hoverRectMax = ImVec2(itemScreenPos.x + itemWidth, itemScreenPos.y + itemWidth);
+                        ImVec4 hoverColor = ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered];
+                        ImGui::GetWindowDrawList()->AddRectFilled(hoverRectMin, hoverRectMax, IM_COL32(hoverColor.x * 255, hoverColor.y * 255, hoverColor.z * 255, hoverColor.w * 255), ImGui::GetStyle().FrameRounding);
+                    }
+
+                    // Make right-click context menu appear for button
                     if (ImGui::BeginPopupContextItem()) {
                         ImGui::PushID("File Context Menu");
                         if (ImGui::BeginMenu("Open With")) {
@@ -118,17 +172,17 @@ namespace TotkToolkit::UI::Windows::Filesystem {
                         ImGui::PopID();
                         ImGui::EndPopup();
                     }
-                    if (ImGui::IsItemHovered()) {
-                        ImVec2 hoverRectMin = ImVec2(itemScreenPos.x, itemScreenPos.y);
-                        ImVec2 hoverRectMax = ImVec2(itemScreenPos.x + itemWidth, itemScreenPos.y + itemWidth);
-                        ImVec4 hoverColor = ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered];
-                        ImGui::GetWindowDrawList()->AddRectFilled(hoverRectMin, hoverRectMax, IM_COL32(hoverColor.x * 255, hoverColor.y * 255, hoverColor.z * 255, hoverColor.w * 255), ImGui::GetStyle().FrameRounding);
-                    }
+
+                    // Set the cursor back as if we never drew that invisible button
                     ImGui::SetCursorPos(itemPos);
+
+                    // Draw the icon
                     ImGui::PushFont(TotkToolkit::UI::Fonts::sNormalFont2x);
                     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + itemWidth / 2 - ImGui::GetFontSize() / 2);
                     ImGui::Text(TotkToolkit::UI::Icons::FILE_ICON);
                     ImGui::PopFont();
+
+                    // Draw the name
                     ImGui::TextWrapped((mCurrentFiles[i]).c_str());
 
                     ImGui::PopID();
