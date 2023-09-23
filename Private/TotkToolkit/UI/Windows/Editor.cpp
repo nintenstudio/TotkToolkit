@@ -1,12 +1,12 @@
-#pragma once
-
 #include <TotkToolkit/UI/Windows/Editor.h>
 
 #include <imgui.h>
-#include <memory>
 
 namespace TotkToolkit::UI::Windows {
 	Editor::Editor(TotkToolkit::IO::FileHandle fileHandle, std::string name, bool* open) : TotkToolkit::IO::Editor(fileHandle), TotkToolkit::UI::Window(name, open) {
+		mWindowFlags |= ImGuiWindowFlags_MenuBar;
+	}
+	Editor::Editor(std::shared_ptr<Formats::Resource> resource, std::string name, bool* open) : TotkToolkit::IO::Editor(resource), TotkToolkit::UI::Window(name, open) {
 		mWindowFlags |= ImGuiWindowFlags_MenuBar;
 	}
 

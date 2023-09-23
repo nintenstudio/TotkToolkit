@@ -12,7 +12,7 @@
 	url = https://github.com/nintenstudio/GLFW.git
 [submodule "Lib/Switch-GLAD"]
 	path = Lib/Switch-GLAD
-	url = https://github.com/devkitPro/switch-glad.git
+	url = https://github.com/nintenstudio/switch-glad.git
 [submodule "Lib/Sarc_Archiver"]
 	path = Lib/Sarc_Archiver
 	url = https://github.com/nintenstudio/sarc_archiver.git
@@ -25,3 +25,6 @@
 [submodule "Lib/Fallback"]
 	path = Lib/Fallback
 	url = https://github.com/nintenstudio/Fallback.git
+[submodule "Lib/ASTC-Encoder"]
+	path = Lib/ASTC-Encoder
+	url = https://github.com/nintenstudio/astc-encoder.git

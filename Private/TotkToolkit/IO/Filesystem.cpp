@@ -2,13 +2,12 @@
 
 #include <TotkToolkit/Messaging/NoticeBoard.h>
 #include <TotkToolkit/Messaging/Notices/IO/Filesystem/FilesChange.h>
-#include <TotkToolkit/IO/Streams/Physfs/PhysfsBasic.h>
-#include <TotkToolkit/IO/Streams/File/FileBasic.h>
 #include <TotkToolkit/IO/PHYSFSCalls/Mount.h>
 #include <TotkToolkit/IO/PHYSFSCalls/MountMemory.h>
 #include <TotkToolkit/IO/PHYSFSCalls/Unmount.h>
 #include <TotkToolkit/IO/PHYSFSCalls/SetWriteDir.h>
 #include <TotkToolkit/IO/PHYSFSCall.h>
+#include <TotkToolkit/IO/Streams/Physfs/Physfs.h>
 #include <Formats/Resources/ZSTD/ZSTDBackend.h>
 #include <archiver_sarc.h>
 #include <physfs.h>
@@ -157,7 +156,7 @@ namespace TotkToolkit::IO {
 		AddPHYSFSCall(std::make_shared<TotkToolkit::IO::PHYSFSCalls::Mount>(path, mountPoint, true, notifyFileChange));
 		ExecutePHYSFSCallQueue();
 	}
-	void Filesystem::MountStream(std::shared_ptr<Formats::IO::BinaryIOStreamBasic> stream, std::string filename, std::string mountPoint, bool notifyFileChange) {
+	void Filesystem::MountStream(std::shared_ptr<Formats::IO::Stream> stream, std::string filename, std::string mountPoint, bool notifyFileChange) {
 		std::shared_ptr<F_U8[]> buffer = stream->GetBuffer();
 		F_UT bufferLength = stream->GetBufferLength();
 		AddPHYSFSCall(std::make_shared<TotkToolkit::IO::PHYSFSCalls::MountMemory>(buffer, bufferLength, nullptr, filename, mountPoint, true, notifyFileChange));
@@ -172,15 +171,15 @@ namespace TotkToolkit::IO {
 		ExecutePHYSFSCallQueue();
 	}
 
-	std::shared_ptr<Formats::IO::BinaryIOStreamBasic> Filesystem::GetReadStream(std::string filepath) {
+	std::shared_ptr<Formats::IO::Stream> Filesystem::GetReadStream(std::string filepath) {
 		PHYSFS_File* file = PHYSFS_openRead(filepath.c_str());
 		if (file == nullptr)
 			return nullptr;
-		std::shared_ptr<TotkToolkit::IO::Streams::Physfs::PhysfsBasic> stream = std::make_shared<TotkToolkit::IO::Streams::Physfs::PhysfsBasic>(file);
+		std::shared_ptr<TotkToolkit::IO::Streams::Physfs::Physfs> stream = std::make_shared<TotkToolkit::IO::Streams::Physfs::Physfs>(file);
 
 		if (stream != nullptr && filepath.ends_with(".zs")) {
 			// TOTKTOOLKIT_TODO_FUNCTIONAL: Check for zstandard compression signature.
-			std::shared_ptr<Formats::IO::BinaryIOStreamBasic> decompressed = Formats::Resources::ZSTD::ZSTDBackend::Decompress(stream);
+			std::shared_ptr<Formats::IO::Stream> decompressed = Formats::Resources::ZSTD::ZSTDBackend::Decompress(stream);
 			if (decompressed != nullptr)
 				return decompressed;
 			return nullptr; // Not sure what to do here.. filename ends in zs but either can't be decompressed or isn't compressed.
@@ -189,10 +188,10 @@ namespace TotkToolkit::IO {
 			return stream;
 		}
 	}
-	std::shared_ptr<Formats::IO::BinaryIOStreamBasic> Filesystem::GetWriteStream(std::string filepath) {
+	std::shared_ptr<Formats::IO::Stream> Filesystem::GetWriteStream(std::string filepath) {
 		PHYSFS_mkdir(std::filesystem::path(filepath).parent_path().generic_string().c_str());
 		PHYSFS_File* file = PHYSFS_openWrite(filepath.c_str());
-		return std::make_shared<TotkToolkit::IO::Streams::Physfs::PhysfsBasic>(file);
+		return std::make_shared<TotkToolkit::IO::Streams::Physfs::Physfs>(file);
 	}
 	std::string Filesystem::GetRealDir(std::string path) {
 		return PHYSFS_getRealDir(path.c_str());

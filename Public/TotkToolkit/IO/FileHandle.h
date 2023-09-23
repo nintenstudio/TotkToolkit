@@ -1,16 +1,19 @@
 #pragma once
 
-#include <Formats/IO/BinaryIOStreamBasic.h>
+#include <Formats/IO/Stream.h>
 #include <memory>
 #include <string>
 
 namespace TotkToolkit::IO {
 	class FileHandle {
 	public:
+		FileHandle();
 		FileHandle(std::string path);
 
-		std::shared_ptr<Formats::IO::BinaryIOStreamBasic> GetReadStream();
-		std::shared_ptr<Formats::IO::BinaryIOStreamBasic> GetWriteStream();
+		bool IsNull();
+
+		std::shared_ptr<Formats::IO::Stream> GetReadStream();
+		std::shared_ptr<Formats::IO::Stream> GetWriteStream();
 
 	protected:
 		std::string mPath;

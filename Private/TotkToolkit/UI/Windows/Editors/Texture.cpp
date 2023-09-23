@@ -7,6 +7,9 @@ namespace TotkToolkit::UI::Windows::Editors {
     Texture::Texture(TotkToolkit::IO::FileHandle fileHandle, std::string name, bool* open) : TotkToolkit::UI::Windows::Editor(fileHandle, name, open) {
 
     }
+    Texture::Texture(std::shared_ptr<Formats::Resource> resource, std::string name, bool* open) : TotkToolkit::UI::Windows::Editor(resource, name, open) {
+
+    }
 
     void Texture::DrawContents() {
         TotkToolkit::UI::Windows::Editor::DrawContents();

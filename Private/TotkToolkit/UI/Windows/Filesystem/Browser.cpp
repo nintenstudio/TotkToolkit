@@ -6,12 +6,14 @@
 #include <TotkToolkit/UI/EditorSystem.h>
 #include <TotkToolkit/UI/Windows/Editors/BYML.h>
 #include <TotkToolkit/UI/Windows/Editors/TXTG.h>
+#include <TotkToolkit/Resources/TexToGo.h>
 #include <TotkToolkit/UI/Localization/TranslationSource.h>
 #include <TotkToolkit/UI/Icons.h>
 #include <TotkToolkit/UI/Fonts.h>
 #include <TotkToolkit/Messaging/NoticeBoard.h>
 #include <TotkToolkit/Messaging/Notices/Configuration/Settings/Change/DumpDir.h>
 #include <TotkToolkit/Messaging/Notices/IO/Filesystem/FilesChange.h>
+#include <TotkToolkit/Messaging/Notices/Errors/UI/Windows/Editor/ParseFailed.h>
 #include <Formats/Aliases/Primitives.h>
 #include <Fallback/shared_ptr_atomic.h>
 #include <imgui.h>
@@ -153,16 +155,19 @@ namespace TotkToolkit::UI::Windows::Filesystem {
                             if (ImGui::MenuItem("BYML Text")) {
                                 std::string currentFilePath = GetCurrentPath() + mCurrentFiles[i];
                                 std::shared_ptr<TotkToolkit::UI::Windows::Editors::BYML> editor = std::make_shared<TotkToolkit::UI::Windows::Editors::BYML>(TotkToolkit::IO::FileHandle(currentFilePath), mCurrentFiles[i], nullptr);
-                                std::shared_ptr<Formats::IO::BinaryIOStreamBasic> fileStream = TotkToolkit::IO::Filesystem::GetReadStream(currentFilePath);
-                                editor->Parse();
-                                TotkToolkit::UI::EditorSystem::AddEditor(editor);
+                                std::shared_ptr<Formats::IO::Stream> fileStream = TotkToolkit::IO::Filesystem::GetReadStream(currentFilePath);
+                                if (editor->Parse())
+                                    TotkToolkit::UI::EditorSystem::AddEditor(editor);
+                                else
+                                    TotkToolkit::Messaging::NoticeBoard::AddNotice(std::make_shared<TotkToolkit::Messaging::Notices::Errors::UI::Windows::Editor::ParseFailed>(currentFilePath));
                             }
                             else if (ImGui::MenuItem("TXTG Texture")) {
                                 std::string currentFilePath = GetCurrentPath() + mCurrentFiles[i];
-                                std::shared_ptr<TotkToolkit::UI::Windows::Editors::TXTG> editor = std::make_shared<TotkToolkit::UI::Windows::Editors::TXTG>(TotkToolkit::IO::FileHandle(currentFilePath), mCurrentFiles[i], nullptr);
-                                std::shared_ptr<Formats::IO::BinaryIOStreamBasic> fileStream = TotkToolkit::IO::Filesystem::GetReadStream(currentFilePath);
-                                editor->Parse();
-                                TotkToolkit::UI::EditorSystem::AddEditor(editor);
+                                std::shared_ptr<TotkToolkit::UI::Windows::Editors::TXTG> editor = std::make_shared<TotkToolkit::UI::Windows::Editors::TXTG>(TotkToolkit::Resources::TexToGo::GetTXTGByFilepath(currentFilePath), mCurrentFiles[i], nullptr);
+                                if (editor->Parse())
+                                    TotkToolkit::UI::EditorSystem::AddEditor(editor);
+                                else
+                                    TotkToolkit::Messaging::NoticeBoard::AddNotice(std::make_shared<TotkToolkit::Messaging::Notices::Errors::UI::Windows::Editor::ParseFailed>(currentFilePath));
                             }
 
                             ImGui::PopID();

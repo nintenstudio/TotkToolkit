@@ -1,7 +1,7 @@
 #pragma once
 
 #include <TotkToolkit/Messaging/ExternalReceivers/IO/Filesystem.h>
-#include <Formats/IO/BinaryIOStreamBasic.h>
+#include <Formats/IO/Stream.h>
 #include <memory>
 #include <vector>
 #include <string>
@@ -17,12 +17,12 @@ namespace TotkToolkit::IO {
 		static void SyncThread();
 
 		static void Mount(std::string path, std::string mountPoint, bool notifyFileChange = true);
-		static void MountStream(std::shared_ptr<Formats::IO::BinaryIOStreamBasic> stream, std::string filename, std::string mountPoint, bool notifyFileChange = true);
+		static void MountStream(std::shared_ptr<Formats::IO::Stream> stream, std::string filename, std::string mountPoint, bool notifyFileChange = true);
 		static void Unmount(std::string path, bool notifyFileChange = true);
 		static void SetWriteDir(std::string dir);
 
-		static std::shared_ptr<Formats::IO::BinaryIOStreamBasic> GetReadStream(std::string filepath);
-		static std::shared_ptr<Formats::IO::BinaryIOStreamBasic> GetWriteStream(std::string filepath);
+		static std::shared_ptr<Formats::IO::Stream> GetReadStream(std::string filepath);
+		static std::shared_ptr<Formats::IO::Stream> GetWriteStream(std::string filepath);
 		static std::string GetRealDir(std::string path);
 
 		static std::vector<std::string> EnumerateFiles(std::string path);

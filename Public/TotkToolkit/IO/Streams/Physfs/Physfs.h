@@ -1,24 +1,29 @@
 #pragma once
 
-#include <Formats/IO/BinaryIOStream.h>
+#include <Formats/IO/Stream.h>
 
+#include <Formats/IO/EndianReader.h>
 #include <Formats/IO/Endianness.h>
 #include <physfs.h>
 #include <vector>
 
+namespace TotkToolkit::IO::Streams::Physfs::EndianReaders {
+	class Big;
+	class Little;
+}
+
 #define TOTKTOOLKIT_IO_STREAMS_PHYSFS_READ(type, name) virtual type Read##name() override {\
 		type res;\
-		ReadBytesWithEndian(&res, sizeof(type));\
+		mEndianReader->ReadBytesWithEndian(&res, sizeof(type));\
 		return res;\
 	}
 #define TOTKTOOLKIT_IO_STREAMS_PHYSFS_WRITE(type, name) virtual void Write##name(type value) override {\
-		WriteBytesWithEndian(&value, sizeof(type));\
+		mEndianReader->WriteBytesWithEndian(&value, sizeof(type));\
 	}
 
 namespace TotkToolkit::IO::Streams::Physfs {
-	class Physfs : public Formats::IO::BinaryIOStream {
+	class Physfs : public Formats::IO::Stream {
 	public:
-		static std::shared_ptr<Formats::IO::BinaryIOStream> Factory(PHYSFS_File* file, Formats::IO::Endianness endianness);
 		Physfs(PHYSFS_File* file);
 
 		virtual void Seek(std::streampos pos) override;
@@ -27,8 +32,10 @@ namespace TotkToolkit::IO::Streams::Physfs {
 		virtual std::streampos GetSeek() override;
 		virtual void AlignSeek(std::streampos alignment) override;
 
-		virtual std::string ReadZeroTerminatedString(F_U32 allocation = FORMATS_IO_BINARYIOSTREAM_READ_STRING_DEFAULTALLOCATION) override;
+		virtual std::string ReadZeroTerminatedString(F_U32 allocation = FORMATS_IO_STREAM_READ_STRING_DEFAULTALLOCATION) override;
 		virtual void WriteZeroTerminatedString(std::string value) override;
+
+		virtual void SetEndianness(Formats::IO::Endianness endianness) override;
 
 		virtual F_U8 ReadU8() override {
 			F_U8 res;
@@ -70,16 +77,21 @@ namespace TotkToolkit::IO::Streams::Physfs {
 		TOTKTOOLKIT_IO_STREAMS_PHYSFS_WRITE(F_F64, F64)
 
 		virtual void ReadBytes(void* out, F_U32 size) override;
-
 		virtual void WriteBytes(const void* in, F_U32 size) override;
 
+		virtual std::shared_ptr<F_U8[]> GetBuffer() override;
+		virtual F_UT GetBufferLength() override;
+
 	protected:
-		virtual void ReadBytesWithEndian(void* out, PHYSFS_uint64 length) = 0;
-		virtual void WriteBytesWithEndian(void* in, PHYSFS_uint64 length) = 0;
+		std::shared_ptr<Formats::IO::EndianReader> mEndianReader;
 
 		PHYSFS_File* mFile;
 		std::vector<std::streampos> mSeekStack;
+
+		friend class TotkToolkit::IO::Streams::Physfs::EndianReaders::Little;
+		friend class TotkToolkit::IO::Streams::Physfs::EndianReaders::Big;
 	};
 }
 
 #undef TOTKTOOLKIT_IO_STREAMS_PHYSFS_READ
+#undef TOTKTOOLKIT_IO_STREAMS_PHYSFS_WRITE

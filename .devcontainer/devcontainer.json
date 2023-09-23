@@ -8,10 +8,12 @@
         "nintenstudio/Formats": {
           "permissions": "write-all"
         },
+        "nintenstudio/Fallback": {
+          "permissions": "write-all"
+        },
         "nintenstudio/GLFW": {
           "permissions": "write-all"
         },
-
         "nintenstudio/sarc_archiver": {
           "permissions": "write-all"
         },
@@ -22,6 +24,15 @@
           "permissions": "write-all"
         },
         "nintenstudio/Switch-CMake": {
+          "permissions": "write-all"
+        },
+        "nintenstudio/switch-glad": {
+          "permissions": "write-all"
+        },
+        "nintenstudio/CTegra-Swizzle": {
+          "permissions": "write-all"
+        },
+        "nintenstudio/astc-encoder": {
           "permissions": "write-all"
         }
       }

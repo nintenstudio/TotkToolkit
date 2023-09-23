@@ -19,6 +19,7 @@
 #include <TotkToolkit/UI/Windows/Rendering/Viewport.h>
 #include <TotkToolkit/Rendering/RenderingSystem.h>
 #include <TotkToolkit/UI/EditorSystem.h>
+#include <TotkToolkit/UI/ErrorSystem.h>
 #include <TotkToolkit/UI/Fonts.h>
 #include <TotkToolkit/IO/Filesystem.h>
 
@@ -192,6 +193,7 @@ int main()
 
     TotkToolkit::IO::Filesystem::Init();
     TotkToolkit::UI::EditorSystem::Init();
+    TotkToolkit::UI::ErrorSystem::Init();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -206,6 +208,7 @@ int main()
         mainWindow.Draw();
         viewport.Draw();
         TotkToolkit::UI::EditorSystem::Draw();
+        TotkToolkit::UI::ErrorSystem::Draw();
 
         ImGui::Render();
         int display_w, display_h;

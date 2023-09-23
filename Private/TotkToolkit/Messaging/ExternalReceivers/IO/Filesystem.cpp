@@ -17,17 +17,17 @@ namespace TotkToolkit::Messaging::ExternalReceivers::IO {
 					TotkToolkit::IO::Filesystem::Mount(castNotice->mNewDumpDir, "");
 
 					// Initialize ZSTD dictionaries
-					std::shared_ptr<Formats::IO::BinaryIOStreamBasic> ZsDicPack = TotkToolkit::IO::Filesystem::GetReadStream("romfs/Pack/ZsDic.pack.zs");
+					std::shared_ptr<Formats::IO::Stream> ZsDicPack = TotkToolkit::IO::Filesystem::GetReadStream("romfs/Pack/ZsDic.pack.zs");
 					if (ZsDicPack != nullptr) {
 						TotkToolkit::IO::Filesystem::MountStream(ZsDicPack, "ZsDic.pack.zs", "romfs");
 
-						std::shared_ptr<Formats::IO::BinaryIOStreamBasic> ZsZsdic = TotkToolkit::IO::Filesystem::GetReadStream("romfs/zs.zsdic");
+						std::shared_ptr<Formats::IO::Stream> ZsZsdic = TotkToolkit::IO::Filesystem::GetReadStream("romfs/zs.zsdic");
 						if (ZsZsdic != nullptr)
 							Formats::Resources::ZSTD::ZSTDBackend::AddDict(ZsZsdic);
-						std::shared_ptr<Formats::IO::BinaryIOStreamBasic> BcettBymlZsdic = TotkToolkit::IO::Filesystem::GetReadStream("romfs/bcett.byml.zsdic");
+						std::shared_ptr<Formats::IO::Stream> BcettBymlZsdic = TotkToolkit::IO::Filesystem::GetReadStream("romfs/bcett.byml.zsdic");
 						if (BcettBymlZsdic != nullptr)
 							Formats::Resources::ZSTD::ZSTDBackend::AddDict(BcettBymlZsdic);
-						std::shared_ptr<Formats::IO::BinaryIOStreamBasic> PackZsDic = TotkToolkit::IO::Filesystem::GetReadStream("romfs/pack.zsdic");
+						std::shared_ptr<Formats::IO::Stream> PackZsDic = TotkToolkit::IO::Filesystem::GetReadStream("romfs/pack.zsdic");
 						if (PackZsDic != nullptr)
 							Formats::Resources::ZSTD::ZSTDBackend::AddDict(PackZsDic);
 					}

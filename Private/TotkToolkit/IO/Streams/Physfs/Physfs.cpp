@@ -1,18 +1,11 @@
 #include <TotkToolkit/IO/Streams/Physfs/Physfs.h>
 
-#include <TotkToolkit/IO/Streams/Physfs/Little.h>
-#include <TotkToolkit/IO/Streams/Physfs/Big.h>
+#include <TotkToolkit/IO/Streams/Physfs/EndianReaders/Little.h>
+#include <TotkToolkit/IO/Streams/Physfs/EndianReaders/Big.h>
+#include <Formats/Aliases/Primitives.h>
 #include <cassert>
 
 namespace TotkToolkit::IO::Streams::Physfs {
-	std::shared_ptr<Formats::IO::BinaryIOStream> Physfs::Factory(PHYSFS_File* file, Formats::IO::Endianness endianness) {
-		assert(endianness == Formats::IO::Endianness::LITTLE || endianness == Formats::IO::Endianness::BIG);
-
-		if (endianness == Formats::IO::Endianness::LITTLE)
-			return std::make_shared<TotkToolkit::IO::Streams::Physfs::Little>(file);
-		else
-			return std::make_shared<TotkToolkit::IO::Streams::Physfs::Big>(file);
-	}
 	Physfs::Physfs(PHYSFS_File* file) : mFile(file) {
 
 	}
@@ -56,10 +49,37 @@ namespace TotkToolkit::IO::Streams::Physfs {
 		PHYSFS_writeBytes(mFile, value.c_str(), value.size() + 1);
 	}
 
+	void Physfs::SetEndianness(Formats::IO::Endianness endianness) {
+		switch (endianness) {
+            case Formats::IO::Endianness::LITTLE:
+                mEndianReader = std::make_shared<TotkToolkit::IO::Streams::Physfs::EndianReaders::Little>(this);
+                break;
+            case Formats::IO::Endianness::BIG:
+                mEndianReader = std::make_shared<TotkToolkit::IO::Streams::Physfs::EndianReaders::Big>(this);
+                break;
+            default:
+                assert(false); // endianness is invalid!
+        }
+	}
+
 	void Physfs::ReadBytes(void* out, F_U32 size) {
 		PHYSFS_readBytes(mFile, out, size);
 	}
 	void Physfs::WriteBytes(const void* in, F_U32 size) {
 		PHYSFS_writeBytes(mFile, in, size);
+	}
+
+	std::shared_ptr<F_U8[]> Physfs::GetBuffer() {
+		PushSeek(0);
+
+		F_U64 length = (F_U64)GetBufferLength();
+
+		std::shared_ptr<F_U8[]> res = std::shared_ptr<F_U8[]>(new F_U8[length]);
+		PHYSFS_readBytes(mFile, res.get(), length);
+		
+		return res;
+	}
+	F_UT Physfs::GetBufferLength() {
+		return (F_UT)PHYSFS_fileLength(mFile);
 	}
 }

@@ -23,7 +23,7 @@ namespace TotkToolkit::Threading::Tasks::IO::Filesystem {
             if (!*mContinueCondition)
                 return;
 
-            std::shared_ptr<Formats::IO::BinaryIOStreamBasic> pack = TotkToolkit::IO::Filesystem::GetReadStream(packPath);
+            std::shared_ptr<Formats::IO::Stream> pack = TotkToolkit::IO::Filesystem::GetReadStream(packPath);
             if (pack != nullptr)
                 TotkToolkit::IO::Filesystem::MountStream(pack, std::filesystem::path(packPath).filename().generic_string(), "romfs", false);
             mTaskReport->AddProgress(1.f / packPaths.size());

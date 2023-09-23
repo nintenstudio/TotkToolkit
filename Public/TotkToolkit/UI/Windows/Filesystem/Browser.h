@@ -12,7 +12,7 @@
 
 namespace TotkToolkit::UI::Windows::Filesystem {
     class Browser : public TotkToolkit::UI::Window, public TotkToolkit::Messaging::Receiver {
-public:
+    public:
         Browser(bool* open);
 
         virtual void DrawContents() override;
@@ -21,7 +21,7 @@ public:
 
         virtual void HandleNotice(std::shared_ptr<TotkToolkit::Messaging::Notice> notice) override;
 
-protected:
+    protected:
         void UpdateItems();
         void UpdateFiles();
         void UpdateDirectories();

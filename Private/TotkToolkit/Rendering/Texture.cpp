@@ -32,6 +32,24 @@ namespace TotkToolkit::Rendering {
 		glTexImage3D(target, level, internalFormat, width, height, depth, 0, format, type, data);
 	}
 
+	void Texture::Init1DCompressed(GLenum target, GLint level, GLenum internalFormat, GLsizei width, GLint border, GLsizei imageSize, const GLvoid* data) {
+		mTarget = target;
+		Bind();
+		glCompressedTexImage1D(target, level, internalFormat, width, border, imageSize, data);
+	}
+
+	void Texture::Init2DCompressed(GLenum target, GLint level, GLenum internalFormat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data) {
+		mTarget = target;
+		Bind();
+		glCompressedTexImage2D(target, level, internalFormat, width, height, border, imageSize, data);
+	}
+
+	void Texture::Init3DCompressed(GLenum target, GLint level, GLenum internalFormat, GLsizei width, GLsizei depth, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data) {
+		mTarget = target;
+		Bind();
+		glCompressedTexImage3D(target, level, internalFormat, width, height, depth, border, imageSize, data);
+	}
+
 	void Texture::Init2DMultisample(GLenum target, GLsizei samples, GLint internalFormat, GLsizei width, GLsizei height, GLboolean fixedSampleLocations) {
 		mTarget = target;
 		Bind();
