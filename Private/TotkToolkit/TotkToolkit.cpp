@@ -135,6 +135,30 @@ int main()
     ImWchar iconRanges[] = { 0xe000, 0xe0fe, 0 };
     ImGui::GetIO().Fonts->AddFontFromFileTTF("romfs:/Resources/Fonts/OpenFontIcons.ttf", fontSize, &config, iconRanges);
 
+    // .5x size font
+    config.GlyphOffset = ImVec2(0, 0);
+    config.MergeMode = false;
+    config.PixelSnapH = false;
+    TotkToolkit::UI::Fonts::sNormalFont_5x = ImGui::GetIO().Fonts->AddFontFromFileTTF("romfs:/Resources/Fonts/Roboto.ttf", fontSize * 0.5f);
+
+    config.GlyphOffset = ImVec2(0, 0.1875 * fontSize * 0.5f);
+    config.MergeMode = true;
+    config.PixelSnapH = true;
+    ImWchar iconRanges_5x[] = { 0xe000, 0xe0fe, 0 };
+    ImGui::GetIO().Fonts->AddFontFromFileTTF("romfs:/Resources/Fonts/OpenFontIcons.ttf", fontSize * 0.5f, &config, iconRanges_5x);
+
+    // .75x size font
+    config.GlyphOffset = ImVec2(0, 0);
+    config.MergeMode = false;
+    config.PixelSnapH = false;
+    TotkToolkit::UI::Fonts::sNormalFont_75x = ImGui::GetIO().Fonts->AddFontFromFileTTF("romfs:/Resources/Fonts/Roboto.ttf", fontSize * 0.75f);
+
+    config.GlyphOffset = ImVec2(0, 0.1875 * fontSize * 0.75f);
+    config.MergeMode = true;
+    config.PixelSnapH = true;
+    ImWchar iconRanges_75x[] = { 0xe000, 0xe0fe, 0 };
+    ImGui::GetIO().Fonts->AddFontFromFileTTF("romfs:/Resources/Fonts/OpenFontIcons.ttf", fontSize * 0.75f, &config, iconRanges_75x);
+
     // 2x size font
     config.GlyphOffset = ImVec2(0, 0);
     config.MergeMode = false;
@@ -162,6 +186,30 @@ int main()
     config.GlyphOffset = ImVec2(0, 0.1875 * fontSize);
     ImWchar iconRanges[] = {0xe000, 0xe0fe, 0};
     ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/OpenFontIcons.ttf", fontSize, &config, iconRanges);
+
+    // .5x size font
+    config.GlyphOffset = ImVec2(0, 0);
+    config.MergeMode = false;
+    config.PixelSnapH = false;
+    TotkToolkit::UI::Fonts::sNormalFont_5x = ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/Roboto.ttf", fontSize * 0.5f);
+
+    config.GlyphOffset = ImVec2(0, 0.1875 * fontSize * 0.5f);
+    config.MergeMode = true;
+    config.PixelSnapH = true;
+    ImWchar iconRanges_5x[] = { 0xe000, 0xe0fe, 0 };
+    ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/OpenFontIcons.ttf", fontSize * 0.5f, &config, iconRanges_5x);
+
+    // .75x size font
+    config.GlyphOffset = ImVec2(0, 0);
+    config.MergeMode = false;
+    config.PixelSnapH = false;
+    TotkToolkit::UI::Fonts::sNormalFont_75x = ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/Roboto.ttf", fontSize * 0.75f);
+
+    config.GlyphOffset = ImVec2(0, 0.1875 * fontSize * 0.75f);
+    config.MergeMode = true;
+    config.PixelSnapH = true;
+    ImWchar iconRanges_75x[] = { 0xe000, 0xe0fe, 0 };
+    ImGui::GetIO().Fonts->AddFontFromFileTTF("Resources/Fonts/OpenFontIcons.ttf", fontSize * 0.75f, &config, iconRanges_75x);
 
     // 2x size font
     config.GlyphOffset = ImVec2(0, 0);

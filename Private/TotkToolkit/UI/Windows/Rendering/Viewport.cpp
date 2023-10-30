@@ -25,7 +25,7 @@ namespace TotkToolkit::UI::Windows::Rendering {
 		}
 
 		mFramebuffer->Bind();
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

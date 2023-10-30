@@ -8,6 +8,7 @@
 #include <TotkToolkit/UI/Windows/Editors/TXTG.h>
 #include <TotkToolkit/Resources/TexToGo.h>
 #include <TotkToolkit/UI/Localization/TranslationSource.h>
+#include <TotkToolkit/UI/ImGuiUtil.h>
 #include <TotkToolkit/UI/Icons.h>
 #include <TotkToolkit/UI/Fonts.h>
 #include <TotkToolkit/Messaging/NoticeBoard.h>
@@ -63,7 +64,7 @@ namespace TotkToolkit::UI::Windows::Filesystem {
         ImVec2 fileTableStart = ImGui::GetCursorPos();
         ImVec2 fileTableSize = ImGui::GetContentRegionAvail();
         if (itemsPerCol > 0) {
-            if (ImGui::BeginTable(AppendIdentifier("File Table").c_str(), itemsPerCol, ImGuiTableFlags_SizingFixedSame | ImGuiTableColumnFlags_NoHeaderWidth)) {
+            if (ImGui::BeginTable(AppendIdentifier("File Table").c_str(), itemsPerCol, ImGuiTableFlags_SizingFixedFit)) {
                 for (F_U32 i = 0; i < mCurrentDirectories.size(); i++) {
                     // Go to the next column
                     ImGui::TableNextColumn();
@@ -103,12 +104,13 @@ namespace TotkToolkit::UI::Windows::Filesystem {
 
                     // Draw the icon
                     ImGui::PushFont(TotkToolkit::UI::Fonts::sNormalFont2x);
-                    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + itemWidth / 2 - ImGui::GetFontSize() / 2);
-                    ImGui::Text(TotkToolkit::UI::Icons::FOLDER_ICON);
+                    TotkToolkit::UI::ImGuiUtil::TextCentered(TotkToolkit::UI::Icons::FOLDER_ICON, ImGui::GetCursorPos().x, ImGui::GetCursorPos().x + itemWidth);
                     ImGui::PopFont();
 
                     // Draw the name
-                    ImGui::TextWrapped((mCurrentDirectories[i]).c_str());
+                    ImGui::PushFont(TotkToolkit::UI::Fonts::sNormalFont_75x);
+                    TotkToolkit::UI::ImGuiUtil::TextCenteredWrapped((mCurrentDirectories[i]).c_str(), ImGui::GetCursorPos().x, ImGui::GetCursorPos().x + itemWidth);
+                    ImGui::PopFont();
                 }
                 for (F_U32 i = 0; i < mCurrentFiles.size(); i++) {
                     ImGui::PushID(i);
@@ -183,12 +185,13 @@ namespace TotkToolkit::UI::Windows::Filesystem {
 
                     // Draw the icon
                     ImGui::PushFont(TotkToolkit::UI::Fonts::sNormalFont2x);
-                    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + itemWidth / 2 - ImGui::GetFontSize() / 2);
-                    ImGui::Text(TotkToolkit::UI::Icons::FILE_ICON);
+                    TotkToolkit::UI::ImGuiUtil::TextCentered(TotkToolkit::UI::Icons::FILE_ICON, ImGui::GetCursorPos().x, ImGui::GetCursorPos().x + itemWidth);
                     ImGui::PopFont();
 
                     // Draw the name
-                    ImGui::TextWrapped((mCurrentFiles[i]).c_str());
+                    ImGui::PushFont(TotkToolkit::UI::Fonts::sNormalFont_75x);
+                    TotkToolkit::UI::ImGuiUtil::TextCenteredWrapped((mCurrentFiles[i]).c_str(), ImGui::GetCursorPos().x, ImGui::GetCursorPos().x + itemWidth);
+                    ImGui::PopFont();
 
                     ImGui::PopID();
                 }
