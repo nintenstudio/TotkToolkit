@@ -4,6 +4,7 @@
 
 #include <TotkToolkit/UI/Windows/Filesystem/Browser.h>
 #include <TotkToolkit/UI/Windows/Configuration/Settings.h>
+#include <TotkToolkit/UI/Windows/Configuration/Style.h>
 #include <TotkToolkit/UI/Window.h>
 #include <TotkToolkit/Messaging/Receiver.h>
 
@@ -24,8 +25,10 @@ public:
 protected:
         TotkToolkit::UI::Windows::Filesystem::Browser mBrowser;
         TotkToolkit::UI::Windows::Configuration::Settings mSettings;
+        TotkToolkit::UI::Windows::Configuration::Style mStyle;
 
         bool mBrowserOpen = true;
         bool mSettingsOpen = false;
+        bool mStyleOpen = false;
     };
 }
