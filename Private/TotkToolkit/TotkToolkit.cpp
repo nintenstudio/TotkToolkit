@@ -245,9 +245,28 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
+#if (SWITCH)
+        static bool wantTextInputLast = false;
+        if (io.WantTextInput && !wantTextInputLast) {
+            SwkbdConfig kbd;
+            char tmpoutstr[16] = {0};
+            Result rc = swkbdCreate(&kbd, 0);
+            if (R_SUCCEEDED(rc)) {
+                swkbdConfigMakePresetDefault(&kbd);
+                rc = swkbdShow(&kbd, tmpoutstr, sizeof(tmpoutstr));
+            }
+            if (R_SUCCEEDED(rc)) {
+                io.AddInputCharacter(tmpoutstr[0]);
+            }
+            swkbdClose(&kbd);
+        }
+        wantTextInputLast = io.WantTextInput;
+#endif
+
         glfwPollEvents();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
+
         ImGui::NewFrame();
         ImGui::DockSpaceOverViewport();
         if (showDemoWindow)

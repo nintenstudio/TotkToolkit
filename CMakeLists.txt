@@ -110,7 +110,7 @@ if (SWITCH)
     target_include_directories(TotkToolkit SYSTEM PUBLIC ${LIBNX_INCLUDE_DIR})
     target_link_libraries(TotkToolkit PUBLIC ${LIBNX_LIBRARY})
     target_include_directories(glfw SYSTEM PUBLIC ${LIBNX_INCLUDE_DIR})
-    target_include_directories(sarc_archiver SYSTEM PUBLIC ${LIBNX_INCLUDE_DIR})
+    target_include_directories(physfs-static SYSTEM PUBLIC ${LIBNX_INCLUDE_DIR})
 
     # Include PORTLIBS
     target_include_directories(glfw PUBLIC ${PORTLIBS}/include)
