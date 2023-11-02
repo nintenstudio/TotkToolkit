@@ -16,7 +16,7 @@ endfunction()
 
 cmake_minimum_required(VERSION 3.10)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
@@ -86,6 +86,7 @@ add_subdirectory(Lib/Sarc_Archiver)
 target_link_libraries(TotkToolkit PUBLIC sarc_archiver)
 
 # Use ASTC-Encoder
+set(ASTCENC_CLI OFF CACHE BOOL "" FORCE)
 add_subdirectory(Lib/ASTC-Encoder)
 target_link_libraries(TotkToolkit PUBLIC astcenc-native-static)
 
@@ -112,15 +113,25 @@ if (SWITCH)
     target_include_directories(glfw SYSTEM PUBLIC ${LIBNX_INCLUDE_DIR})
     target_include_directories(physfs-static SYSTEM PUBLIC ${LIBNX_INCLUDE_DIR})
 
+    message(STATUS "SRC DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
+    message(STATUS "BIN DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+    file(COPY ${PORTLIBS}/include/GLFW ${PORTLIBS}/include/KHR ${PORTLIBS}/include/EGL DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/PortlibsInclude)
+
     # Include PORTLIBS
-    target_include_directories(glfw PUBLIC ${PORTLIBS}/include)
+    target_include_directories(glfw PUBLIC 
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/PortlibsInclude>
+        $<INSTALL_INTERFACE:PortlibsInclude>
+    )
 
     # Set up GLAPI
     find_library(GLAPI NAMES glapi REQUIRED)
     target_link_libraries(TotkToolkit PUBLIC ${GLAPI})
 
     # Give GLAD PORTLIBS include path so it can load KHR/khrplatform.h
-    target_include_directories(GLAD PUBLIC ${PORTLIBS}/include)
+    target_include_directories(GLAD PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/PortlibsInclude>
+        $<INSTALL_INTERFACE:PortlibsInclude>
+    )
 
     # Set up EGL as imported target (because it requires GLAPI)
     find_library(EGL NAMES EGL REQUIRED)
