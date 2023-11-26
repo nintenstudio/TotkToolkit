@@ -2,7 +2,7 @@
 
 
 #include <iostream>
-#ifdef SWITCH
+#if (SWITCH)
 #include <switch.h>
 #endif
 #include <glad/glad.h>
@@ -24,6 +24,55 @@
 #include <TotkToolkit/IO/Filesystem.h>
 
 #include <fstream>
+#include <string>
+
+#if (SWITCH)
+static int swkbdBackspaceCount = 0;
+static int swkbdEnterCount = 0;
+static int swkbdLeftCount = 0;
+static int swkbdRightCount = 0;
+
+static int swkbdCursorPos = 0;
+void swkbdChangedStringCallback(const char* str, SwkbdChangedStringArg* arg) {
+    static std::string lastString;
+    std::string string = str;
+
+
+    if (string.size() > lastString.size()) {
+        ImGui::GetIO().AddInputCharacter(string[swkbdCursorPos]);
+        swkbdCursorPos++;
+    }
+    if (string.size() < lastString.size()) {
+        ImGui::GetIO().AddKeyEvent(ImGuiKey_Backspace, true);
+        swkbdBackspaceCount++;
+        swkbdCursorPos--;
+    }
+
+    lastString = string;
+}
+
+void swkbdMovedCursorCallback(const char* str, SwkbdMovedCursorArg* arg) {
+    if (swkbdCursorPos < arg->cursorPos) {
+        ImGui::GetIO().AddKeyEvent(ImGuiKey_L, true);
+        swkbdLeftCount++;
+    }
+    else if (swkbdCursorPos > arg->cursorPos) {
+        ImGui::GetIO().AddKeyEvent(ImGuiKey_R, true);
+        swkbdRightCount++;
+    }
+
+    swkbdCursorPos = arg->cursorPos;
+}
+
+void swkbdDecidedEnterCallback(const char* str, SwkbdDecidedEnterArg* arg) {
+    ImGui::GetIO().AddKeyEvent(ImGuiKey_Enter, true);
+    swkbdEnterCount++;
+}
+
+void swkbdDecidedCancelCallback() {
+}
+#endif
+
 
 int main()
 {
@@ -243,9 +292,34 @@ int main()
     TotkToolkit::UI::EditorSystem::Init();
     TotkToolkit::UI::ErrorSystem::Init();
 
+#if (SWITCH)
+    SwkbdInline swkbdInline;
+    if (swkbdInlineCreate(&swkbdInline) != 0)
+        return -1;
+    if (swkbdInlineLaunchForLibraryApplet(&swkbdInline, SwkbdInlineMode_AppletDisplay, 0) != 0)
+        return -1;
+    swkbdInlineSetChangedStringCallback(&swkbdInline, swkbdChangedStringCallback);
+    swkbdInlineSetMovedCursorCallback(&swkbdInline, swkbdMovedCursorCallback);
+    swkbdInlineSetDecidedEnterCallback(&swkbdInline, swkbdDecidedEnterCallback);
+    swkbdInlineSetDecidedCancelCallback(&swkbdInline, swkbdDecidedCancelCallback);
+
+    SwkbdAppearArg appearArg;
+    swkbdInlineMakeAppearArg(&appearArg, SwkbdType_Normal);
+    appearArg.dicFlag = 1;
+    appearArg.returnButtonFlag = 1;
+#endif
 	while (!glfwWindowShouldClose(window))
 	{
 #if (SWITCH)
+        static bool swkbdLastVisible = false;
+        if (io.WantTextInput && !swkbdLastVisible) {
+            swkbdInlineAppear(&swkbdInline, &appearArg);
+        }
+        if (io.WantTextInput && swkbdInlineUpdate(&swkbdInline, NULL) != 0)
+            return -1;
+
+        swkbdLastVisible = io.WantTextInput;
+        /*
         static bool wantTextInputLast = false;
         if (io.WantTextInput && !wantTextInputLast) {
             SwkbdConfig kbd;
@@ -256,14 +330,20 @@ int main()
                 rc = swkbdShow(&kbd, tmpoutstr, sizeof(tmpoutstr));
             }
             if (R_SUCCEEDED(rc)) {
-                io.AddInputCharacter(tmpoutstr[0]);
+                for (int i = 0; i < 16; i++)
+                    io.AddInputCharacter(tmpoutstr[i]);
             }
             swkbdClose(&kbd);
         }
         wantTextInputLast = io.WantTextInput;
+        */
 #endif
-
+#if (SWITCH)
+        if (!io.WantTextInput)
+            glfwPollEvents();
+#else
         glfwPollEvents();
+#endif
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
 
@@ -291,10 +371,33 @@ int main()
             ImGui::UpdatePlatformWindows(); 
             ImGui::RenderPlatformWindowsDefault(); 
             glfwMakeContextCurrent(backup_current_context); 
-        } 
+        }
 
     	glfwSwapBuffers(window);
+
+#if (SWITCH)
+        if (swkbdBackspaceCount > 0) {
+            io.AddKeyEvent(ImGuiKey_Backspace, false);
+            swkbdBackspaceCount--;
+        }
+        if (swkbdEnterCount > 0) {
+            io.AddKeyEvent(ImGuiKey_Enter, false);
+            swkbdEnterCount--;
+        }
+        if (swkbdLeftCount > 0) {
+            io.AddKeyEvent(ImGuiKey_L, false);
+            swkbdLeftCount--;
+        }
+        if (swkbdRightCount > 0) {
+            io.AddKeyEvent(ImGuiKey_R, false);
+            swkbdRightCount--;
+        }
+#endif
 	}
+
+#if (SWITCH)
+    swkbdInlineClose(&swkbdInline);
+#endif
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

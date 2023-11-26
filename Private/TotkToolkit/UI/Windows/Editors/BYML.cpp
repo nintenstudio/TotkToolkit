@@ -19,6 +19,7 @@ namespace TotkToolkit::UI::Windows::Editors {
 	}
 
 	bool BYML::Serialize() {
+		mBYML->LoadYAML(mTextEditor.GetText());
 		mBYML->SetStream(mFileHandle.GetWriteStream());
 		return mBYML->Serialize();
 	}

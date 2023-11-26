@@ -25,7 +25,7 @@ namespace TotkToolkit::UI::Windows::Filesystem {
         TotkToolkit::Messaging::NoticeBoard::AddReceiver(this);
 
         std::unique_lock<std::shared_mutex> lock(mSegmentedCurrentPathMutex);
-        //mSegmentedCurrentPath.push_back("romfs");
+        mSegmentedCurrentPath.push_back("romfs");
     }
 
     void Browser::DrawContents() {
